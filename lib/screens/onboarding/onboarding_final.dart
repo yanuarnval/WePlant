@@ -2,7 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_flutter/screens/home/home_page.dart';
 import 'package:mobile_flutter/screens/main_screen.dart';
-import 'package:mobile_flutter/weplant_theme.dart';
+import 'package:mobile_flutter/shared/color_weplant.dart';
 
 class OnBoardingFinal extends StatefulWidget {
   const OnBoardingFinal({Key? key}) : super(key: key);
@@ -21,15 +21,18 @@ class _OnBoardingFinalState extends State<OnBoardingFinal> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              const Spacer(
+                flex: 1,
+              ),
               FadeInUp(
                 duration: const Duration(milliseconds: 1500),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 14),
-                  child: Image.asset(
-                    "assets/onboarding/onboardingfinal.png",
-                    width: MediaQuery.of(context).size.width * 0.7,
-                  ),
+                child: Image.asset(
+                  "assets/onboarding/onboardingfinal.png",
+                  width: MediaQuery.of(context).size.width * 0.7,
                 ),
+              ),
+              const Spacer(
+                flex: 1,
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -43,7 +46,7 @@ class _OnBoardingFinalState extends State<OnBoardingFinal> {
                         "WEPLANT Is The Bigges Plant Shop In World",
                         style: TextStyle(
                           fontSize: 28,
-                          color: WeplantTheme.colorPrimary,
+                          color: ColorsWeplant.colorPrimary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -67,11 +70,11 @@ class _OnBoardingFinalState extends State<OnBoardingFinal> {
                       delay: const Duration(milliseconds: 1000),
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 12),
-                        child: Row(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             MaterialButton(
-                                color: WeplantTheme.colorPrimary,
+                                color: ColorsWeplant.colorPrimary,
                                 child: const Text(
                                   "Login",
                                   style: TextStyle(

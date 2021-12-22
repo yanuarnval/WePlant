@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_flutter/components/onboarding_content.dart';
 
-import 'package:mobile_flutter/screens/onboarding_final.dart';
-import 'package:mobile_flutter/weplant_theme.dart';
+import 'components/onboarding_content.dart';
+import 'package:mobile_flutter/screens/onboarding/onboarding_final.dart';
+import 'package:mobile_flutter/shared/color_weplant.dart';
 
 class OnBoardingpage extends StatefulWidget {
   const OnBoardingpage({Key? key}) : super(key: key);
@@ -81,30 +81,7 @@ class _OnBoardingpageState extends State<OnBoardingpage> {
                         width: 130,
                         height: 45,
                         child: (currentPage == (onBoardingData.length - 1))
-                            ? MaterialButton(
-                                onPressed: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (BuildContext c) {
-                                        return const OnBoardingFinal();
-                                      },
-                                    ),
-                                  );
-                                },
-                                color: WeplantTheme.colorPrimary,
-                                elevation: 0,
-                                child: Text(
-                                  "get started",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 18,
-                                      color: currentPage ==
-                                              (onBoardingData.length - 1)
-                                          ? Colors.white
-                                          : Colors.black),
-                                ),
-                              )
+                            ? _buildButtonStart(context)
                             : const SizedBox()),
                     const Spacer()
                   ],
@@ -117,6 +94,35 @@ class _OnBoardingpageState extends State<OnBoardingpage> {
     );
   }
 
+  MaterialButton _buildButtonStart(BuildContext context) {
+    return MaterialButton(
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20))),
+      autofocus: false,
+      onPressed: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext c) {
+              return const OnBoardingFinal();
+            },
+          ),
+        );
+      },
+      color: ColorsWeplant.colorPrimary,
+      elevation: 0,
+      child: Text(
+        "get started",
+        style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 18,
+            color: currentPage == (onBoardingData.length - 1)
+                ? Colors.white
+                : Colors.black),
+      ),
+    );
+  }
+
   AnimatedContainer _buildDot(int index) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -125,7 +131,7 @@ class _OnBoardingpageState extends State<OnBoardingpage> {
       height: 6,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(3),
-        color: currentPage == index ? const Color(0xff5BA74E) : Colors.grey,
+        color: currentPage == index ? ColorsWeplant.colorPrimary : Colors.grey,
       ),
     );
   }

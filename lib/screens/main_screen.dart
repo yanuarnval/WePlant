@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mobile_flutter/screens/favorit_page.dart';
 import 'package:mobile_flutter/screens/home/home_page.dart';
 import 'package:mobile_flutter/screens/keranjang.dart';
 import 'package:mobile_flutter/screens/profil_page.dart';
-import 'package:mobile_flutter/weplant_theme.dart';
+import 'package:mobile_flutter/shared/color_weplant.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -23,61 +25,51 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedPage,
-        children: pages,
+      body: Stack(
+        children: [
+          pages[_selectedPage],
+          _buildBottomNavigationbar(),
+        ],
       ),
-      extendBody: true,
-      bottomNavigationBar: Container(
-        margin: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(50),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 2,
-              blurRadius: 7,
-              offset: const Offset(0, 3),
-            )
-          ],
-        ),
+      resizeToAvoidBottomInset: false,
+    );
+  }
+
+  Positioned _buildBottomNavigationbar() {
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        margin: const EdgeInsets.all(8.0),
+        decoration:
+            BoxDecoration(borderRadius: BorderRadius.circular(50), boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 4,
+            offset: const Offset(0, -3),
+          ),
+        ]),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(50),
           child: BottomNavigationBar(
               elevation: 0,
-              backgroundColor: WeplantTheme.colorBottomNav,
+              backgroundColor: Colors.white,
               showSelectedLabels: false,
               showUnselectedLabels: false,
+              selectedIconTheme:
+                  const IconThemeData(color: ColorsWeplant.colorPrimary),
               type: BottomNavigationBarType.fixed,
-              items: [
+              items: const [
                 BottomNavigationBarItem(
-                  label: "",
-                  icon: Image.asset(
-                    "assets/icons/home_icon.png",
-                    width: 22,
-                  ),
-                ),
+                    label: "", icon: FaIcon(FontAwesomeIcons.store)),
                 BottomNavigationBarItem(
-                  label: "",
-                  icon: Image.asset(
-                    "assets/icons/favorit_icon.png",
-                    width: 22,
-                  ),
-                ),
+                    label: "", icon: FaIcon(FontAwesomeIcons.shoppingBag)),
                 BottomNavigationBarItem(
-                  label: "",
-                  icon: Image.asset(
-                    "assets/icons/keranjang_icon.png",
-                    width: 22,
-                  ),
-                ),
+                    label: "", icon: FaIcon(FontAwesomeIcons.newspaper)),
                 BottomNavigationBarItem(
-                  label: "",
-                  icon: Image.asset(
-                    "assets/icons/profil_icon.png",
-                    width: 22,
-                  ),
-                )
+                    label: "", icon: FaIcon(FontAwesomeIcons.userAlt)),
               ],
               currentIndex: _selectedPage,
               onTap: onItemTapped),

@@ -1,8 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile_flutter/screens/details_page/details_page.dart';
 
-import 'package:mobile_flutter/weplant_theme.dart';
+import 'package:mobile_flutter/shared/color_weplant.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -20,6 +22,15 @@ class _HomePageState extends State<HomePage> {
     "Flower",
     "Indoor",
     "Garden",
+  ];
+
+  static const List<String> listImgMostWanted = [
+    "pendek1.png",
+    "pendek2.png",
+    "tinggi1.png",
+    "tinggi2.png",
+    "pendek2.png",
+    "tinggi1.png",
   ];
 
   int listclick = 0;
@@ -44,10 +55,122 @@ class _HomePageState extends State<HomePage> {
               _buildSliderEvent(),
               _buildSearchCard(),
               _buildListCategory(),
-              _buildCategoryItem(context)
+              _buildCategoryItem(context),
+              _buildMostwanted(context),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Padding _buildMostwanted(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14.0),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Most Wanted',
+                style: GoogleFonts.workSans(
+                    fontWeight: FontWeight.w600, fontSize: 24),
+              ),
+              Text(
+                'See More',
+                style: GoogleFonts.workSans(
+                    fontSize: 17, color: ColorsWeplant.colorPrimary),
+              )
+            ],
+          ),
+          const SizedBox(
+            height: 16,
+          ),
+          GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: MediaQuery.of(context).size.width /
+                      MediaQuery.of(context).size.height *
+                      0.9,
+                  crossAxisSpacing: 17,
+                  mainAxisSpacing: 8),
+              itemCount: listImgMostWanted.length,
+              shrinkWrap: true,
+              physics: const ScrollPhysics(),
+              padding: const EdgeInsets.only(bottom: 100),
+              itemBuilder: (context, index) => Card(
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Image.asset(
+                            (index % 2 == 0)
+                                ? 'assets/mostwanted/tinggi1.png'
+                                : 'assets/mostwanted/pendek1.png',
+                            width: MediaQuery.of(context).size.width * 0.6,
+                            height: MediaQuery.of(context).size.width * 0.3,
+                            fit: BoxFit.cover,
+                          ),
+                          const Spacer(
+                            flex: 2,
+                          ),
+                          Text(
+                            'Indoor',
+                            style: GoogleFonts.workSans(
+                                color: ColorsWeplant.colorTxtSearch),
+                          ),
+                          const Spacer(
+                            flex: 1,
+                          ),
+                          Text(
+                            'Peace Lily ${index}',
+                            style: GoogleFonts.workSans(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 17),
+                          ),
+                          const Spacer(
+                            flex: 1,
+                          ),
+                          Text(
+                            'The peace lily plant is well known for its air-purifying abilities as a houseplant',
+                            style: GoogleFonts.workSans(
+                                color: ColorsWeplant.colorTxtSearch,
+                                fontSize: 12),
+                          ),
+                          const Spacer(),
+                          Row(
+                            children: [
+                              const Icon(Icons.person),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              Text("kota jakarta${index}")
+                            ],
+                          ),
+                          const Spacer(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              const Icon(Icons.favorite_border),
+                              Text(
+                                'IDR 2${index}0.000',
+                                style: GoogleFonts.workSans(
+                                    fontWeight: FontWeight.w600,
+                                    color: ColorsWeplant.colorPrimary),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ))
+        ],
       ),
     );
   }
@@ -65,17 +188,20 @@ class _HomePageState extends State<HomePage> {
           );
         },
         options: CarouselOptions(
-            autoPlay: true, viewportFraction: 1, aspectRatio: 1.9),
+            initialPage: 0,
+            autoPlayInterval: const Duration(seconds: 3),
+            autoPlay: true,
+            viewportFraction: 1,
+            aspectRatio: 1.9),
       ),
     );
   }
 
   Padding _buildHello() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 14.0),
+    return const Padding(
+      padding: EdgeInsets.only(left: 14.0),
       child: Text(
         'Good morning',
-        style: WeplantTheme.lightTextTheme.headline2,
       ),
     );
   }
@@ -83,91 +209,102 @@ class _HomePageState extends State<HomePage> {
   SingleChildScrollView _buildCategoryItem(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 14.0),
+      padding:
+          const EdgeInsets.only(left: 14.0, right: 14, bottom: 38.0, top: 10),
       child: SizedBox(
         width: MediaQuery.of(context).size.width * 0.6 * 5.4,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: List.generate(
             5,
-            (index) => SizedBox(
-              width: MediaQuery.of(context).size.width * 0.6,
-              height: MediaQuery.of(context).size.width * 0.96,
-              child: Container(
-                margin: const EdgeInsets.all(7),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(24)),
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        spreadRadius: 5,
-                        blurRadius: 15,
-                        offset: const Offset(0, 9))
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(18.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Image.asset(
-                        'assets/plantimage1.png',
-                        width: MediaQuery.of(context).size.width * 0.6,
-                        height: MediaQuery.of(context).size.width * 0.4,
-                        fit: BoxFit.cover,
-                      ),
-                      const Spacer(
-                        flex: 2,
-                      ),
-                      Text(
-                        'Indoor',
-                        style: GoogleFonts.workSans(
-                            color: WeplantTheme.colorTxtSearch),
-                      ),
-                      const Spacer(
-                        flex: 1,
-                      ),
-                      Text(
-                        'Peace Lily ${index}',
-                        style: GoogleFonts.workSans(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 22),
-                      ),
-                      const Spacer(
-                        flex: 3,
-                      ),
-                      Text(
-                        'The peace lily plant is well known for its air-purifying abilities as a houseplant',
-                        style: GoogleFonts.workSans(
-                            color: WeplantTheme.colorTxtSearch, fontSize: 13),
-                      ),
-                      const Spacer(),
-                      Row(
-                        children: [
-                          const Icon(Icons.person),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          Text("kota jakarta${index}")
-                        ],
-                      ),
-                      const Spacer(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          const Icon(Icons.favorite_border),
-                          Text(
-                            'IDR 2${index}0.000',
-                            style: GoogleFonts.workSans(
-                                fontWeight: FontWeight.w600,
-                                color: WeplantTheme.colorPrimary),
-                          )
-                        ],
-                      )
+            (index) => GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const DetailsPage()));
+              },
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.6,
+                height: MediaQuery.of(context).size.width * 0.97,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(24)),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 5,
+                          blurRadius: 15,
+                          offset: const Offset(0, 9))
                     ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(18.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Image.asset(
+                          (index % 2 == 0)
+                              ? 'assets/plantimage1.png'
+                              : 'assets/Image.png',
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          height: MediaQuery.of(context).size.width * 0.4,
+                          fit: BoxFit.cover,
+                        ),
+                        const Spacer(
+                          flex: 2,
+                        ),
+                        Text(
+                          'Indoor',
+                          style: GoogleFonts.workSans(
+                              color: ColorsWeplant.colorTxtSearch),
+                        ),
+                        const Spacer(
+                          flex: 1,
+                        ),
+                        Text(
+                          'Peace Lily ${index}',
+                          style: GoogleFonts.workSans(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 20),
+                        ),
+                        const Spacer(
+                          flex: 1,
+                        ),
+                        Text(
+                          'The peace lily plant is well known for its air-purifying abilities as a houseplant',
+                          style: GoogleFonts.workSans(
+                              color: ColorsWeplant.colorTxtSearch,
+                              fontSize: 12),
+                        ),
+                        const Spacer(),
+                        Row(
+                          children: [
+                            const Icon(Icons.person),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Text("kota jakarta${index}")
+                          ],
+                        ),
+                        const Spacer(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            const Icon(Icons.favorite_border),
+                            Text(
+                              'IDR 2${index}0.000',
+                              style: GoogleFonts.workSans(
+                                  fontWeight: FontWeight.w600,
+                                  color: ColorsWeplant.colorPrimary),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -180,7 +317,7 @@ class _HomePageState extends State<HomePage> {
 
   SingleChildScrollView _buildListCategory() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       scrollDirection: Axis.horizontal,
       child: Row(
         children: List.generate(
@@ -194,7 +331,7 @@ class _HomePageState extends State<HomePage> {
                   },
                   child: Card(
                     elevation: 0,
-                    color: WeplantTheme.colorPrimary,
+                    color: ColorsWeplant.colorPrimary,
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(
                         Radius.circular(24),
@@ -221,7 +358,7 @@ class _HomePageState extends State<HomePage> {
                   },
                   child: Card(
                     elevation: 0,
-                    color: WeplantTheme.colorSearchBox,
+                    color: ColorsWeplant.colorSearchBox,
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(
                         Radius.circular(24),
@@ -250,7 +387,7 @@ class _HomePageState extends State<HomePage> {
       padding: const EdgeInsets.symmetric(horizontal: 14.0),
       child: Card(
         elevation: 0,
-        color: WeplantTheme.colorSearchBox,
+        color: ColorsWeplant.colorSearchBox,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(
             Radius.circular(15),
@@ -261,9 +398,10 @@ class _HomePageState extends State<HomePage> {
             IconButton(
               constraints: const BoxConstraints(),
               padding: const EdgeInsets.fromLTRB(12, 0, 5, 0),
-              icon: Image.asset(
-                'assets/icons/search.png',
+              icon: SvgPicture.asset(
+                'assets/icons/search.svg',
                 width: 22,
+                fit: BoxFit.contain,
               ),
               onPressed: () {},
             ),
@@ -273,7 +411,7 @@ class _HomePageState extends State<HomePage> {
                   border: InputBorder.none,
                   hintText: 'Search',
                   hintStyle:
-                      GoogleFonts.workSans(color: WeplantTheme.colorTxtSearch),
+                      GoogleFonts.workSans(color: ColorsWeplant.colorTxtSearch),
                 ),
                 autofocus: false,
                 textInputAction: TextInputAction.done,
