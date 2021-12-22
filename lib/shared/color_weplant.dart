@@ -8,6 +8,7 @@ class ColorsWeplant {
   static const colorTxtSearch = Color(0xff888E9A);
   static const colorblackText = Color(0xff1E1E1E);
   static const colorBlackBody2 = Color(0xff888E9A);
+  static const colorGreenFress = Color(0xff01A512);
 
   // 1
 

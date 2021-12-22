@@ -5,8 +5,8 @@ import 'package:mobile_flutter/shared/color_weplant.dart';
 
 class WeplantTheme {
   static TextTheme textTheme = TextTheme(
-      button:
-          GoogleFonts.poppins(fontWeight: FontWeight.w700, color: Colors.white),
+      button: GoogleFonts.workSans(
+          fontWeight: FontWeight.w400, color: Colors.white),
       bodyText1: GoogleFonts.poppins(
           fontWeight: FontWeight.w700,
           fontSize: 16,
@@ -17,14 +17,15 @@ class WeplantTheme {
           color: ColorsWeplant.colorBlackBody2),
       subtitle1: GoogleFonts.poppins(
           fontSize: 12, fontWeight: FontWeight.w400, color: Colors.black),
-      headline1: GoogleFonts.raleway(
+      headline1: GoogleFonts.playfairDisplay(
           fontWeight: FontWeight.w700,
-          fontSize: 27,
-          color: ColorsWeplant.colorblackText));
+          fontSize: 23,
+          color: ColorsWeplant.colorblackText),
+      headline5: GoogleFonts.poppins(fontSize: 12, color: Colors.white));
 
   static ThemeData Light() {
     SystemChrome.setSystemUIOverlayStyle(
-        const SystemUiOverlayStyle(statusBarColor: Color(0xff286782)));
+        const SystemUiOverlayStyle(statusBarColor: ColorsWeplant.colorPrimary));
     return ThemeData(
         textTheme: textTheme,
         appBarTheme:
@@ -34,7 +35,7 @@ class WeplantTheme {
           style: ElevatedButton.styleFrom(
             primary: ColorsWeplant.colorPrimary,
             elevation: 0,
-            minimumSize: Size(double.infinity, 50),
+            minimumSize: const Size(double.infinity, 50),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
           ),

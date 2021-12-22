@@ -1,5 +1,9 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile_flutter/theme/weplant_theme.dart';
 
 import 'components/onboarding_content.dart';
 import 'package:mobile_flutter/screens/onboarding/onboarding_final.dart';
@@ -14,111 +18,125 @@ class OnBoardingpage extends StatefulWidget {
 
 class _OnBoardingpageState extends State<OnBoardingpage> {
   int currentPage = 0;
-  List<Map<String, String>> onBoardingData = [
-    {
-      "title": "Hobbies Are Fun!",
-      "text": 'Connect with people with similar hobbies in your city.',
-      "image": 'assets/onboarding/onboarding1.png',
-    },
-    {
-      "title": "Find Hobbies",
-      "text": 'Connect with people with similar hobbies in your city.',
-      "image": 'assets/onboarding/onboarding2.png',
-    },
-    {
-      "title": "5 Hobbies Nearby!",
-      "text": 'Connect with people with similar hobbies in your city.',
-      "image": 'assets/onboarding/onboarding3.png',
-    }
-  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              flex: 4,
-              child: PageView.builder(
-                onPageChanged: (value) {
-                  setState(() {
-                    currentPage = value;
-                  });
-                },
-                itemCount: onBoardingData.length,
-                itemBuilder: (context, index) {
-                  if (index == onBoardingData.length) {
-                    return const OnBoardingFinal();
-                  } else {
-                    return OnBoardingContent(
-                      text: onBoardingData[index]["text"]!,
-                      image: onBoardingData[index]["image"]!,
-                      title: onBoardingData[index]["title"]!,
-                    );
-                  }
-                },
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        onBoardingData.length,
-                        (index) => _buildDot(index),
-                      ),
-                    ),
-                    const Spacer(),
-                    SizedBox(
-                        width: 130,
-                        height: 45,
-                        child: (currentPage == (onBoardingData.length - 1))
-                            ? _buildButtonStart(context)
-                            : const SizedBox()),
-                    const Spacer()
-                  ],
-                ),
-              ),
-            )
-          ],
+        child: Stack(
+          children: [_buildPageView(context), _buildBottom(context)],
         ),
       ),
     );
   }
 
-  MaterialButton _buildButtonStart(BuildContext context) {
-    return MaterialButton(
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20))),
-      autofocus: false,
-      onPressed: () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext c) {
-              return const OnBoardingFinal();
-            },
+  SizedBox _buildPageView(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height,
+      child: PageView.builder(
+        onPageChanged: (value) {
+          setState(() {
+            currentPage = value;
+          });
+        },
+        itemCount: 3,
+        itemBuilder: (context, index) {
+          if (index == 3) {
+            return const OnBoardingFinal();
+          } else {
+            return const OnBoardingContent();
+          }
+        },
+      ),
+    );
+  }
+
+  Positioned _buildBottom(BuildContext context) {
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+          child: Container(
+            decoration: const BoxDecoration(
+                color: Colors.white10,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(15),
+                    topRight: Radius.circular(15))),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                        right: MediaQuery.of(context).size.width * 0.2,
+                        bottom: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            text: 'Dekorasi ruang mu dengan ',
+                            style: WeplantTheme.textTheme.headline1,
+                            children: <TextSpan>[
+                              TextSpan(
+                                  text: 'tanaman',
+                                  style: GoogleFonts.roboto(
+                                      color: ColorsWeplant.colorPrimary)),
+                              const TextSpan(text: ' cantik!')
+                            ],
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          'Dekorasi yang estetik akan menambah energi yang positif',
+                          style: WeplantTheme.textTheme.headline5,
+                        )
+                      ],
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        width: 50,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: List.generate(
+                            3,
+                            (index) => _buildDot(index),
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: (currentPage == 2)
+                                ? ColorsWeplant.colorGreenFress
+                                : ColorsWeplant.colorPrimary,
+                            minimumSize: const Size(100, 45),
+                          ),
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        const OnBoardingFinal()));
+                          },
+                          child: Text(
+                            (currentPage == 2) ? 'Get started' : 'Next',
+                            style: WeplantTheme.textTheme.button,
+                          )),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
-        );
-      },
-      color: ColorsWeplant.colorPrimary,
-      elevation: 0,
-      child: Text(
-        "get started",
-        style: TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 18,
-            color: currentPage == (onBoardingData.length - 1)
-                ? Colors.white
-                : Colors.black),
+        ),
       ),
     );
   }
@@ -127,11 +145,21 @@ class _OnBoardingpageState extends State<OnBoardingpage> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       margin: const EdgeInsets.only(left: 5),
-      width: currentPage == index ? 20 : 6,
-      height: 6,
+      width: 9.5,
+      height: 9.5,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(3),
-        color: currentPage == index ? ColorsWeplant.colorPrimary : Colors.grey,
+        borderRadius: BorderRadius.circular(5),
+        color: currentPage == index
+            ? ColorsWeplant.colorGreenFress.withOpacity((index == 0)
+                ? 1
+                : (index == 1)
+                    ? 0.8
+                    : 0.6)
+            : (currentPage != 0 && index == 0)
+                ? ColorsWeplant.colorGreenFress
+                : (currentPage != 0 && index == 1)
+                    ? ColorsWeplant.colorGreenFress.withOpacity(0.8)
+                    : Colors.white,
       ),
     );
   }
