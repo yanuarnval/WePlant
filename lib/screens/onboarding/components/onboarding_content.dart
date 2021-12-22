@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_flutter/weplant_theme.dart';
+import 'package:mobile_flutter/shared/color_weplant.dart';
+import 'package:mobile_flutter/theme/weplant_theme.dart';
 
 class OnBoardingContent extends StatelessWidget {
   final String text, image, title;
@@ -20,13 +21,13 @@ class OnBoardingContent extends StatelessWidget {
         ),
         Text(
           title,
-          style: WeplantTheme.lightTextTheme.headline2,
+          style: WeplantTheme.textTheme.headline1,
         ),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(
             text,
-            style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 16),
+            style: WeplantTheme.textTheme.bodyText2,
             textAlign: TextAlign.center,
           ),
         )
