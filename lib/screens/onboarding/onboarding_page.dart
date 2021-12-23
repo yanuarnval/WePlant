@@ -4,6 +4,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_flutter/bloc/onboarding_bloc.dart';
 import 'package:mobile_flutter/theme/weplant_theme.dart';
@@ -19,13 +20,8 @@ class OnBoardingpage extends StatefulWidget {
 }
 
 class _OnBoardingpageState extends State<OnBoardingpage> {
-  int currentPage = 0;
   final _pageViewController = PageController();
-  List<String> onBoardingData = [
-    'assets/images/gambar.jpg',
-    'assets/images/onboarding1.jpg',
-    'assets/images/onboarding2.jpg',
-  ];
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -51,26 +47,25 @@ class _OnBoardingpageState extends State<OnBoardingpage> {
     return SizedBox(
       height: MediaQuery.of(context).size.height,
       child: BlocBuilder<OnboardingBloc, int>(builder: (context, returnV) {
-        return PageView.builder(
+        return PageView(
           controller: _pageViewController,
           onPageChanged: (value) {
             context.read<OnboardingBloc>().increment(value);
           },
-          itemCount: 3,
-          itemBuilder: (context, index) {
-            if (index == 3) {
-              return const OnBoardingFinal();
-            } else {
-              return SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: Image.asset(
-                  onBoardingData[index],
-                  fit: BoxFit.fill,
-                ),
-              );
-            }
-          },
+          children: [
+            Image.asset(
+              'assets/images/gambar.jpg',
+              fit: BoxFit.fill,
+            ),
+            Image.asset(
+              'assets/images/onboarding1.jpg',
+              fit: BoxFit.fill,
+            ),
+            Image.asset(
+              'assets/images/onboarding2.jpg',
+              fit: BoxFit.fill,
+            )
+          ],
         );
       }),
     );
@@ -87,9 +82,9 @@ class _OnBoardingpageState extends State<OnBoardingpage> {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
           child: Container(
-            decoration: const BoxDecoration(
-                color: Colors.white10,
-                borderRadius: BorderRadius.only(
+            decoration:  BoxDecoration(
+                color: Colors.white.withOpacity(0.4),
+                borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(15),
                     topRight: Radius.circular(15))),
             child: Padding(
@@ -193,16 +188,12 @@ class _OnBoardingpageState extends State<OnBoardingpage> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
           color: count == index
-              ? ColorsWeplant.colorGreenFress.withOpacity((index == 0)
-                  ? 1
-                  : (index == 1)
-                      ? 0.6
-                      : 0.4)
-              : (currentPage != 0 && index == 0)
+              ? ColorsWeplant.colorGreenFress
+              : (count != 0 && index == 0)
                   ? ColorsWeplant.colorGreenFress
-                  : (currentPage != 0 && index == 1)
+                  : (count != 0 && index == 1)
                       ? ColorsWeplant.colorGreenFress.withOpacity(0.8)
-                      : Colors.white,
+                      : Colors.transparent,
         ),
       );
     });

@@ -31,14 +31,39 @@ class _OnBoardingFinalState extends State<OnBoardingFinal> {
               bottom: 0,
               left: 0,
               right: 0,
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(15),
-                    topRight: Radius.circular(15)),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                  child: Container(
-                    height: 200,
+              child: Container(
+                height: 200,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(15),
+                      topLeft: Radius.circular(15)),
+                  color: Colors.white,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              primary: Colors.white, elevation: 3),
+                          onPressed: () {},
+                          child:  Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.login,color: Colors.black,),
+                              Text(
+                                'login',
+                                style: GoogleFonts.workSans(color: Colors.black),
+                              ),
+                            ],
+                          )),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      ElevatedButton(
+                          onPressed: () {}, child: const Text('register'))
+                    ],
                   ),
                 ),
               ))
