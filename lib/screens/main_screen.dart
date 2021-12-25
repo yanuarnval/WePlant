@@ -63,13 +63,13 @@ class _MainScreenState extends State<MainScreen> {
               type: BottomNavigationBarType.fixed,
               items: const [
                 BottomNavigationBarItem(
-                    label: "", icon: FaIcon(FontAwesomeIcons.store)),
+                    label: "", icon: FaIcon(FontAwesomeIcons.store,size: 20,)),
                 BottomNavigationBarItem(
-                    label: "", icon: FaIcon(FontAwesomeIcons.shoppingBag)),
+                    label: "", icon: FaIcon(FontAwesomeIcons.shoppingBag,size: 20,)),
                 BottomNavigationBarItem(
-                    label: "", icon: FaIcon(FontAwesomeIcons.newspaper)),
+                    label: "", icon: FaIcon(FontAwesomeIcons.newspaper,size: 20,)),
                 BottomNavigationBarItem(
-                    label: "", icon: FaIcon(FontAwesomeIcons.userAlt)),
+                    label: "", icon: FaIcon(FontAwesomeIcons.userAlt,size: 20,)),
               ],
               currentIndex: _selectedPage,
               onTap: onItemTapped),

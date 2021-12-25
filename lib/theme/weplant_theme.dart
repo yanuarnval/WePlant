@@ -24,8 +24,7 @@ class WeplantTheme {
       headline5: GoogleFonts.poppins(fontSize: 12, color: Colors.white));
 
   static ThemeData Light() {
-    SystemChrome.setSystemUIOverlayStyle(
-        const SystemUiOverlayStyle(statusBarColor: ColorsWeplant.colorPrimary));
+
     return ThemeData(
         textTheme: textTheme,
         appBarTheme:

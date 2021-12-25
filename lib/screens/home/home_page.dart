@@ -1,10 +1,17 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile_flutter/bloc/home_bloc.dart';
+import 'package:mobile_flutter/model/product_data.dart';
+import 'package:mobile_flutter/model/product_model.dart';
 import 'package:mobile_flutter/screens/details_page/details_page.dart';
+import 'package:mobile_flutter/screens/loadingScreens/home_page_loading.dart';
 
 import 'package:mobile_flutter/shared/color_weplant.dart';
+import 'package:mobile_flutter/theme/weplant_theme.dart';
+import 'package:skeleton_text/skeleton_text.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,6 +21,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final scaffoldState = GlobalKey<ScaffoldState>();
+
   late TextEditingController _searchBoxTxt;
   static const List<String> listCategory = [
     "Top Picks",
@@ -24,16 +33,8 @@ class _HomePageState extends State<HomePage> {
     "Garden",
   ];
 
-  static const List<String> listImgMostWanted = [
-    "pendek1.png",
-    "pendek2.png",
-    "tinggi1.png",
-    "tinggi2.png",
-    "pendek2.png",
-    "tinggi1.png",
-  ];
-
   int listclick = 0;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -45,131 +46,245 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 12),
-              _buildHello(),
-              _buildSliderEvent(),
-              _buildSearchCard(),
-              _buildListCategory(),
-              _buildCategoryItem(context),
-              _buildMostwanted(context),
-            ],
+        child: BlocProvider<HomeBloc>(
+          create: (_) => HomeBloc(),
+          child: BlocListener<HomeBloc, ProductState>(
+            listener: (_, state) {
+              if (state is FailureLoadProductState) {
+                print('error listener $state');
+              }
+              if (state is LoadingProductState) {
+                print('loading');
+              }
+            },
+            child: BlocBuilder<HomeBloc, ProductState>(
+              builder: (context, state) {
+                if (state is InitialProductState) {
+                  context.read<HomeBloc>().getAllProduct();
+                }
+                if (state is SuccesLoadAllProductState) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 12),
+                        _buildHello(),
+                        _buildSliderEvent(),
+                        _buildSearchCard(),
+                        _buildListCategory(),
+                        _buildCategoryItem(context, state.listProduct),
+                        _buildMostwanted(context,state.listProduct),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const HomePageLoading();
+                }
+              },
+            ),
           ),
         ),
       ),
     );
   }
 
-  Padding _buildMostwanted(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14.0),
+  Container _buildMostwanted(
+      BuildContext context, List<ProductModel> listMostwanted) {
+    return Container(
+      margin: const EdgeInsets.only(left: 12, right: 12, bottom: 60),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Most Wanted',
-                style: GoogleFonts.workSans(
-                    fontWeight: FontWeight.w600, fontSize: 24),
-              ),
-              Text(
-                'See More',
-                style: GoogleFonts.workSans(
-                    fontSize: 17, color: ColorsWeplant.colorPrimary),
-              )
-            ],
-          ),
-          const SizedBox(
-            height: 16,
-          ),
-          GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: MediaQuery.of(context).size.width /
-                      MediaQuery.of(context).size.height *
-                      0.9,
-                  crossAxisSpacing: 17,
-                  mainAxisSpacing: 8),
-              itemCount: listImgMostWanted.length,
-              shrinkWrap: true,
-              physics: const ScrollPhysics(),
-              padding: const EdgeInsets.only(bottom: 100),
-              itemBuilder: (context, index) => Card(
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Image.asset(
-                            (index % 2 == 0)
-                                ? 'assets/mostwanted/tinggi1.png'
-                                : 'assets/mostwanted/pendek1.png',
-                            width: MediaQuery.of(context).size.width * 0.6,
-                            height: MediaQuery.of(context).size.width * 0.3,
-                            fit: BoxFit.cover,
-                          ),
-                          const Spacer(
-                            flex: 2,
-                          ),
-                          Text(
-                            'Indoor',
-                            style: GoogleFonts.workSans(
-                                color: ColorsWeplant.colorTxtSearch),
-                          ),
-                          const Spacer(
-                            flex: 1,
-                          ),
-                          Text(
-                            'Peace Lily ${index}',
-                            style: GoogleFonts.workSans(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 17),
-                          ),
-                          const Spacer(
-                            flex: 1,
-                          ),
-                          Text(
-                            'The peace lily plant is well known for its air-purifying abilities as a houseplant',
-                            style: GoogleFonts.workSans(
-                                color: ColorsWeplant.colorTxtSearch,
-                                fontSize: 12),
-                          ),
-                          const Spacer(),
-                          Row(
-                            children: [
-                              const Icon(Icons.person),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Text("kota jakarta${index}")
-                            ],
-                          ),
-                          const Spacer(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              const Icon(Icons.favorite_border),
-                              Text(
-                                'IDR 2${index}0.000',
-                                style: GoogleFonts.workSans(
-                                    fontWeight: FontWeight.w600,
-                                    color: ColorsWeplant.colorPrimary),
-                              )
-                            ],
-                          )
-                        ],
-                      ),
+              Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.only(left: 5),
+                    width: MediaQuery.of(context).size.width * 0.44,
+                    child: Text(
+                      'Best plant of week',
+                      style: WeplantTheme.textTheme.headline1,
                     ),
-                  ))
+                  ),
+                  Column(
+                    children: List.generate(
+                        4,
+                        (index) => GestureDetector(
+                              onTap: () {},
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.44,
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 15),
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(24)),
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: Colors.grey.withOpacity(0.2),
+                                        spreadRadius: 5,
+                                        blurRadius: 15,
+                                        offset: const Offset(0, 9))
+                                  ],
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Image.network(
+                                        listMostwanted[index]
+                                            .imagesModel['url'],
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.6,
+                                        height:
+                                            MediaQuery.of(context).size.width *
+                                                0.4,
+                                        fit: BoxFit.contain,
+                                      ),
+                                      Text(
+                                        'Indoor',
+                                        style: GoogleFonts.workSans(
+                                            color: ColorsWeplant.colorTxtSearch,
+                                            fontSize: 12),
+                                      ),
+                                      const SizedBox(
+                                        height: 6,
+                                      ),
+                                      Text(
+                                        listMostwanted[index].name,
+                                        style: GoogleFonts.workSans(
+                                            color: Colors.black, fontSize: 13),
+                                      ),
+                                      const SizedBox(
+                                        height: 3,
+                                      ),
+                                      Text(
+                                        'Rp${listMostwanted[index].price}',
+                                        style: GoogleFonts.workSans(
+                                            fontWeight: FontWeight.w600,
+                                            color: ColorsWeplant.colorPrimary,
+                                            fontSize: 13),
+                                      ),
+                                      const SizedBox(
+                                        height: 6,
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.person,
+                                            size: 22,
+                                          ),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            "kota jakarta${index}",
+                                            style:
+                                                const TextStyle(fontSize: 10),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )),
+                  ),
+                ],
+              ),
+              Column(
+                children: List.generate(
+                    4,
+                    (index) => GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.44,
+                            margin: const EdgeInsets.symmetric(vertical: 15),
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(24)),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    spreadRadius: 5,
+                                    blurRadius: 15,
+                                    offset: const Offset(0, 9))
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Image.network(
+                                    listMostwanted[
+                                            (listMostwanted.length - 1) - index]
+                                        .imagesModel['url'],
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.6,
+                                    height:
+                                        MediaQuery.of(context).size.width * 0.4,
+                                    fit: BoxFit.contain,
+                                  ),
+                                  Text(
+                                    'Indoor',
+                                    style: GoogleFonts.workSans(
+                                        color: ColorsWeplant.colorTxtSearch,
+                                        fontSize: 12),
+                                  ),
+                                  const SizedBox(
+                                    height: 6,
+                                  ),
+                                  Text(
+                                    listMostwanted[
+                                            (listMostwanted.length - 1) - index]
+                                        .name,
+                                    style: GoogleFonts.workSans(
+                                        color: Colors.black, fontSize: 13),
+                                  ),
+                                  const SizedBox(
+                                    height: 3,
+                                  ),
+                                  Text(
+                                    'Rp${listMostwanted[(listMostwanted.length - 1) - index].price}',
+                                    style: GoogleFonts.workSans(
+                                        fontWeight: FontWeight.w600,
+                                        color: ColorsWeplant.colorPrimary,
+                                        fontSize: 13),
+                                  ),
+                                  const SizedBox(
+                                    height: 6,
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.person,
+                                        size: 22,
+                                      ),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text(
+                                        "kota jakarta${index}",
+                                        style: const TextStyle(fontSize: 10),
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        )),
+              ),
+            ],
+          )
         ],
       ),
     );
@@ -184,7 +299,7 @@ class _HomePageState extends State<HomePage> {
         itemCount: 3,
         itemBuilder: (BuildContext c, int index, int pageview) {
           return Image.asset(
-            'assets/sale1.png',
+            'assets/images/sale1.png',
           );
         },
         options: CarouselOptions(
@@ -198,25 +313,25 @@ class _HomePageState extends State<HomePage> {
   }
 
   Padding _buildHello() {
-    return const Padding(
+    return Padding(
       padding: EdgeInsets.only(left: 14.0),
       child: Text(
         'Good morning',
+        style: WeplantTheme.textTheme.headline1,
       ),
     );
   }
 
-  SingleChildScrollView _buildCategoryItem(BuildContext context) {
+  SingleChildScrollView _buildCategoryItem(
+      BuildContext context, List<ProductModel> listProduct) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding:
-          const EdgeInsets.only(left: 14.0, right: 14, bottom: 38.0, top: 10),
       child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.6 * 5.4,
+        width: MediaQuery.of(context).size.width * 0.45 * listProduct.length,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: List.generate(
-            5,
+            listProduct.length,
             (index) => GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -224,87 +339,73 @@ class _HomePageState extends State<HomePage> {
                     MaterialPageRoute(
                         builder: (context) => const DetailsPage()));
               },
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.6,
-                height: MediaQuery.of(context).size.width * 0.97,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(24)),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
-                          spreadRadius: 5,
-                          blurRadius: 15,
-                          offset: const Offset(0, 9))
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.4,
+                margin: const EdgeInsets.only(top: 15, bottom: 25),
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(24)),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 5,
+                        blurRadius: 15,
+                        offset: const Offset(0, 9))
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Image.network(
+                        listProduct[index].imagesModel['url'],
+                        width: MediaQuery.of(context).size.width * 0.6,
+                        height: MediaQuery.of(context).size.width * 0.4,
+                        fit: BoxFit.contain,
+                      ),
+                      Text(
+                        'Indoor',
+                        style: GoogleFonts.workSans(
+                            color: ColorsWeplant.colorTxtSearch, fontSize: 12),
+                      ),
+                      const SizedBox(
+                        height: 6,
+                      ),
+                      Text(
+                        listProduct[index].name,
+                        style: GoogleFonts.workSans(
+                            color: Colors.black, fontSize: 13),
+                      ),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      Text(
+                        'Rp${listProduct[index].price}',
+                        style: GoogleFonts.workSans(
+                            fontWeight: FontWeight.w600,
+                            color: ColorsWeplant.colorPrimary,
+                            fontSize: 13),
+                      ),
+                      const SizedBox(
+                        height: 6,
+                      ),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.person,
+                            size: 22,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            "kota jakarta${index}",
+                            style: const TextStyle(fontSize: 10),
+                          )
+                        ],
+                      ),
                     ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Image.asset(
-                          (index % 2 == 0)
-                              ? 'assets/plantimage1.png'
-                              : 'assets/Image.png',
-                          width: MediaQuery.of(context).size.width * 0.6,
-                          height: MediaQuery.of(context).size.width * 0.4,
-                          fit: BoxFit.cover,
-                        ),
-                        const Spacer(
-                          flex: 2,
-                        ),
-                        Text(
-                          'Indoor',
-                          style: GoogleFonts.workSans(
-                              color: ColorsWeplant.colorTxtSearch),
-                        ),
-                        const Spacer(
-                          flex: 1,
-                        ),
-                        Text(
-                          'Peace Lily ${index}',
-                          style: GoogleFonts.workSans(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 20),
-                        ),
-                        const Spacer(
-                          flex: 1,
-                        ),
-                        Text(
-                          'The peace lily plant is well known for its air-purifying abilities as a houseplant',
-                          style: GoogleFonts.workSans(
-                              color: ColorsWeplant.colorTxtSearch,
-                              fontSize: 12),
-                        ),
-                        const Spacer(),
-                        Row(
-                          children: [
-                            const Icon(Icons.person),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Text("kota jakarta${index}")
-                          ],
-                        ),
-                        const Spacer(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            const Icon(Icons.favorite_border),
-                            Text(
-                              'IDR 2${index}0.000',
-                              style: GoogleFonts.workSans(
-                                  fontWeight: FontWeight.w600,
-                                  color: ColorsWeplant.colorPrimary),
-                            )
-                          ],
-                        )
-                      ],
-                    ),
                   ),
                 ),
               ),
