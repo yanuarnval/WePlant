@@ -1,8 +1,17 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile_flutter/bloc/home_bloc.dart';
+import 'package:mobile_flutter/model/product_data.dart';
+import 'package:mobile_flutter/model/product_model.dart';
+import 'package:mobile_flutter/screens/details_page/details_page.dart';
+import 'package:mobile_flutter/screens/loadingScreens/home_page_loading.dart';
 
-import 'package:mobile_flutter/weplant_theme.dart';
+import 'package:mobile_flutter/shared/color_weplant.dart';
+import 'package:mobile_flutter/theme/weplant_theme.dart';
+import 'package:skeleton_text/skeleton_text.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,6 +21,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final scaffoldState = GlobalKey<ScaffoldState>();
+
   late TextEditingController _searchBoxTxt;
   static const List<String> listCategory = [
     "Top Picks",
@@ -23,6 +34,7 @@ class _HomePageState extends State<HomePage> {
   ];
 
   int listclick = 0;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -34,20 +46,246 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 12),
-              _buildHello(),
-              _buildSliderEvent(),
-              _buildSearchCard(),
-              _buildListCategory(),
-              _buildCategoryItem(context)
-            ],
+        child: BlocProvider<HomeBloc>(
+          create: (_) => HomeBloc(),
+          child: BlocListener<HomeBloc, ProductState>(
+            listener: (_, state) {
+              if (state is FailureLoadProductState) {
+                print('error listener $state');
+              }
+              if (state is LoadingProductState) {
+                print('loading');
+              }
+            },
+            child: BlocBuilder<HomeBloc, ProductState>(
+              builder: (context, state) {
+                if (state is InitialProductState) {
+                  context.read<HomeBloc>().getAllProduct();
+                }
+                if (state is SuccesLoadAllProductState) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 12),
+                        _buildHello(),
+                        _buildSliderEvent(),
+                        _buildSearchCard(),
+                        _buildListCategory(),
+                        _buildCategoryItem(context, state.listProduct),
+                        _buildMostwanted(context,state.listProduct),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const HomePageLoading();
+                }
+              },
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Container _buildMostwanted(
+      BuildContext context, List<ProductModel> listMostwanted) {
+    return Container(
+      margin: const EdgeInsets.only(left: 12, right: 12, bottom: 60),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.only(left: 5),
+                    width: MediaQuery.of(context).size.width * 0.44,
+                    child: Text(
+                      'Best plant of week',
+                      style: WeplantTheme.textTheme.headline1,
+                    ),
+                  ),
+                  Column(
+                    children: List.generate(
+                        4,
+                        (index) => GestureDetector(
+                              onTap: () {},
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.44,
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 15),
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(24)),
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: Colors.grey.withOpacity(0.2),
+                                        spreadRadius: 5,
+                                        blurRadius: 15,
+                                        offset: const Offset(0, 9))
+                                  ],
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Image.network(
+                                        listMostwanted[index]
+                                            .imagesModel['url'],
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.6,
+                                        height:
+                                            MediaQuery.of(context).size.width *
+                                                0.4,
+                                        fit: BoxFit.contain,
+                                      ),
+                                      Text(
+                                        'Indoor',
+                                        style: GoogleFonts.workSans(
+                                            color: ColorsWeplant.colorTxtSearch,
+                                            fontSize: 12),
+                                      ),
+                                      const SizedBox(
+                                        height: 6,
+                                      ),
+                                      Text(
+                                        listMostwanted[index].name,
+                                        style: GoogleFonts.workSans(
+                                            color: Colors.black, fontSize: 13),
+                                      ),
+                                      const SizedBox(
+                                        height: 3,
+                                      ),
+                                      Text(
+                                        'Rp${listMostwanted[index].price}',
+                                        style: GoogleFonts.workSans(
+                                            fontWeight: FontWeight.w600,
+                                            color: ColorsWeplant.colorPrimary,
+                                            fontSize: 13),
+                                      ),
+                                      const SizedBox(
+                                        height: 6,
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.person,
+                                            size: 22,
+                                          ),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            "kota jakarta${index}",
+                                            style:
+                                                const TextStyle(fontSize: 10),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )),
+                  ),
+                ],
+              ),
+              Column(
+                children: List.generate(
+                    4,
+                    (index) => GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.44,
+                            margin: const EdgeInsets.symmetric(vertical: 15),
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(24)),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    spreadRadius: 5,
+                                    blurRadius: 15,
+                                    offset: const Offset(0, 9))
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Image.network(
+                                    listMostwanted[
+                                            (listMostwanted.length - 1) - index]
+                                        .imagesModel['url'],
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.6,
+                                    height:
+                                        MediaQuery.of(context).size.width * 0.4,
+                                    fit: BoxFit.contain,
+                                  ),
+                                  Text(
+                                    'Indoor',
+                                    style: GoogleFonts.workSans(
+                                        color: ColorsWeplant.colorTxtSearch,
+                                        fontSize: 12),
+                                  ),
+                                  const SizedBox(
+                                    height: 6,
+                                  ),
+                                  Text(
+                                    listMostwanted[
+                                            (listMostwanted.length - 1) - index]
+                                        .name,
+                                    style: GoogleFonts.workSans(
+                                        color: Colors.black, fontSize: 13),
+                                  ),
+                                  const SizedBox(
+                                    height: 3,
+                                  ),
+                                  Text(
+                                    'Rp${listMostwanted[(listMostwanted.length - 1) - index].price}',
+                                    style: GoogleFonts.workSans(
+                                        fontWeight: FontWeight.w600,
+                                        color: ColorsWeplant.colorPrimary,
+                                        fontSize: 13),
+                                  ),
+                                  const SizedBox(
+                                    height: 6,
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.person,
+                                        size: 22,
+                                      ),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text(
+                                        "kota jakarta${index}",
+                                        style: const TextStyle(fontSize: 10),
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        )),
+              ),
+            ],
+          )
+        ],
       ),
     );
   }
@@ -61,42 +299,51 @@ class _HomePageState extends State<HomePage> {
         itemCount: 3,
         itemBuilder: (BuildContext c, int index, int pageview) {
           return Image.asset(
-            'assets/sale1.png',
+            'assets/images/sale1.png',
           );
         },
         options: CarouselOptions(
-            autoPlay: true, viewportFraction: 1, aspectRatio: 1.9),
+            initialPage: 0,
+            autoPlayInterval: const Duration(seconds: 3),
+            autoPlay: true,
+            viewportFraction: 1,
+            aspectRatio: 1.9),
       ),
     );
   }
 
   Padding _buildHello() {
     return Padding(
-      padding: const EdgeInsets.only(left: 14.0),
+      padding: EdgeInsets.only(left: 14.0),
       child: Text(
         'Good morning',
-        style: WeplantTheme.lightTextTheme.headline2,
+        style: WeplantTheme.textTheme.headline1,
       ),
     );
   }
 
-  SingleChildScrollView _buildCategoryItem(BuildContext context) {
+  SingleChildScrollView _buildCategoryItem(
+      BuildContext context, List<ProductModel> listProduct) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 14.0),
       child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.6 * 5.4,
+        width: MediaQuery.of(context).size.width * 0.45 * listProduct.length,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: List.generate(
-            5,
-            (index) => SizedBox(
-              width: MediaQuery.of(context).size.width * 0.6,
-              height: MediaQuery.of(context).size.width * 0.96,
+            listProduct.length,
+            (index) => GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const DetailsPage()));
+              },
               child: Container(
-                margin: const EdgeInsets.all(7),
+                width: MediaQuery.of(context).size.width * 0.4,
+                margin: const EdgeInsets.only(top: 15, bottom: 25),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(24)),
+                  borderRadius: const BorderRadius.all(Radius.circular(24)),
                   color: Colors.white,
                   boxShadow: [
                     BoxShadow(
@@ -107,66 +354,57 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(18.0),
+                  padding: const EdgeInsets.all(10.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Image.asset(
-                        'assets/plantimage1.png',
+                      Image.network(
+                        listProduct[index].imagesModel['url'],
                         width: MediaQuery.of(context).size.width * 0.6,
                         height: MediaQuery.of(context).size.width * 0.4,
-                        fit: BoxFit.cover,
-                      ),
-                      const Spacer(
-                        flex: 2,
+                        fit: BoxFit.contain,
                       ),
                       Text(
                         'Indoor',
                         style: GoogleFonts.workSans(
-                            color: WeplantTheme.colorTxtSearch),
+                            color: ColorsWeplant.colorTxtSearch, fontSize: 12),
                       ),
-                      const Spacer(
-                        flex: 1,
-                      ),
-                      Text(
-                        'Peace Lily ${index}',
-                        style: GoogleFonts.workSans(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 22),
-                      ),
-                      const Spacer(
-                        flex: 3,
+                      const SizedBox(
+                        height: 6,
                       ),
                       Text(
-                        'The peace lily plant is well known for its air-purifying abilities as a houseplant',
+                        listProduct[index].name,
                         style: GoogleFonts.workSans(
-                            color: WeplantTheme.colorTxtSearch, fontSize: 13),
+                            color: Colors.black, fontSize: 13),
                       ),
-                      const Spacer(),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      Text(
+                        'Rp${listProduct[index].price}',
+                        style: GoogleFonts.workSans(
+                            fontWeight: FontWeight.w600,
+                            color: ColorsWeplant.colorPrimary,
+                            fontSize: 13),
+                      ),
+                      const SizedBox(
+                        height: 6,
+                      ),
                       Row(
                         children: [
-                          const Icon(Icons.person),
+                          const Icon(
+                            Icons.person,
+                            size: 22,
+                          ),
                           const SizedBox(
                             width: 5,
                           ),
-                          Text("kota jakarta${index}")
-                        ],
-                      ),
-                      const Spacer(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          const Icon(Icons.favorite_border),
                           Text(
-                            'IDR 2${index}0.000',
-                            style: GoogleFonts.workSans(
-                                fontWeight: FontWeight.w600,
-                                color: WeplantTheme.colorPrimary),
+                            "kota jakarta${index}",
+                            style: const TextStyle(fontSize: 10),
                           )
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -180,7 +418,7 @@ class _HomePageState extends State<HomePage> {
 
   SingleChildScrollView _buildListCategory() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       scrollDirection: Axis.horizontal,
       child: Row(
         children: List.generate(
@@ -194,7 +432,7 @@ class _HomePageState extends State<HomePage> {
                   },
                   child: Card(
                     elevation: 0,
-                    color: WeplantTheme.colorPrimary,
+                    color: ColorsWeplant.colorPrimary,
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(
                         Radius.circular(24),
@@ -221,7 +459,7 @@ class _HomePageState extends State<HomePage> {
                   },
                   child: Card(
                     elevation: 0,
-                    color: WeplantTheme.colorSearchBox,
+                    color: ColorsWeplant.colorSearchBox,
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(
                         Radius.circular(24),
@@ -250,7 +488,7 @@ class _HomePageState extends State<HomePage> {
       padding: const EdgeInsets.symmetric(horizontal: 14.0),
       child: Card(
         elevation: 0,
-        color: WeplantTheme.colorSearchBox,
+        color: ColorsWeplant.colorSearchBox,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(
             Radius.circular(15),
@@ -261,9 +499,10 @@ class _HomePageState extends State<HomePage> {
             IconButton(
               constraints: const BoxConstraints(),
               padding: const EdgeInsets.fromLTRB(12, 0, 5, 0),
-              icon: Image.asset(
-                'assets/icons/search.png',
+              icon: SvgPicture.asset(
+                'assets/icons/search.svg',
                 width: 22,
+                fit: BoxFit.contain,
               ),
               onPressed: () {},
             ),
@@ -273,7 +512,7 @@ class _HomePageState extends State<HomePage> {
                   border: InputBorder.none,
                   hintText: 'Search',
                   hintStyle:
-                      GoogleFonts.workSans(color: WeplantTheme.colorTxtSearch),
+                      GoogleFonts.workSans(color: ColorsWeplant.colorTxtSearch),
                 ),
                 autofocus: false,
                 textInputAction: TextInputAction.done,
