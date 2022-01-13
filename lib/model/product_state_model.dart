@@ -1,17 +1,20 @@
+import 'package:equatable/equatable.dart';
 import 'package:mobile_flutter/model/product_model.dart';
 
-abstract class ProductState{}
-
-class InitialProductState extends ProductState{
-
+abstract class ProductState extends Equatable {
+  @override
+  List<Object?> get props => [];
 }
 
-class LoadingProductState extends ProductState{}
+class InitialProductState extends ProductState {}
 
-class SuccesLoadAllProductState extends ProductState{
+class LoadingProductState extends ProductState {}
+
+class SuccesLoadAllProductState extends ProductState {
   final List<ProductModel> listProduct;
   final String message;
-  SuccesLoadAllProductState(this.listProduct,this.message);
+
+  SuccesLoadAllProductState(this.listProduct, this.message);
 
   @override
   String toString() {
@@ -19,7 +22,7 @@ class SuccesLoadAllProductState extends ProductState{
   }
 }
 
-class FailureLoadProductState extends ProductState{
+class FailureLoadProductState extends ProductState {
   final String errorMessage;
 
   FailureLoadProductState(this.errorMessage);

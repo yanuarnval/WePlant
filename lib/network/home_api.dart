@@ -4,12 +4,13 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import 'package:mobile_flutter/model/product_model.dart';
+import 'package:mobile_flutter/shared/url.dart';
 
 class HomeApi {
-  static const url = 'http://192.168.0.104:3000/api/v1/';
+
 
   static Future<List<ProductModel>> getAllProduct() async {
-    const urlGetAll = '${url}products/';
+    const urlGetAll = '${Url.url_host}products/';
     Map<String,dynamic> result;
     List<ProductModel> listProduct=[];
     final List<dynamic> jsonarray;

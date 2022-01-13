@@ -1,15 +1,15 @@
 import 'dart:ui';
 
-import 'package:animate_do/animate_do.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'package:mobile_flutter/bloc/onboarding_bloc.dart';
-import 'package:mobile_flutter/login/login_page.dart';
-import 'package:mobile_flutter/theme/weplant_theme.dart';
+
+import 'package:mobile_flutter/screens/login/login_page.dart';
+import 'package:mobile_flutter/screens/register/register_page.dart';
+
 import 'package:mobile_flutter/shared/color_weplant.dart';
 
 class OnBoardingpage extends StatefulWidget {
@@ -21,6 +21,11 @@ class OnBoardingpage extends StatefulWidget {
 
 class _OnBoardingpageState extends State<OnBoardingpage> {
   final _pageViewController = PageController();
+  List<Map<String, String>> assets = [
+    {"image": 'assets/images/login-page2.png', "text": "lorem ipsum dolor sit"},
+    {"image": 'assets/images/login-page1.png', "text": "lorem ipsum dolor sit"},
+    {"image": 'assets/images/login-page3.png', "text": "lorem ipsum dolor sit"}
+  ];
 
   @override
   void dispose() {
@@ -34,10 +39,14 @@ class _OnBoardingpageState extends State<OnBoardingpage> {
     return Scaffold(
       body: SafeArea(
         child: BlocProvider(
+          create: (_) => OnboardingBloc(),
+          child: BlocProvider<OnboardingBloc>(
             create: (_) => OnboardingBloc(),
-            child: Stack(
+            child: Column(
               children: [_buildSliderEvent(), _buildBottom(context)],
-            )),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -45,93 +54,174 @@ class _OnBoardingpageState extends State<OnBoardingpage> {
   SizedBox _buildSliderEvent() {
     return SizedBox(
       width: double.infinity,
-      height: MediaQuery.of(context).size.height,
-      child: Image.asset(
-        'assets/images/onboarding.jpg',
-        fit: BoxFit.fill,
-      ),
+      height: MediaQuery.of(context).size.height * 0.57,
+      child: BlocBuilder<OnboardingBloc, int>(builder: (context, current) {
+        return Stack(
+          children: [
+            PageView(
+                scrollDirection: Axis.horizontal,
+                onPageChanged: (index) {
+                  context.read<OnboardingBloc>().increment(index);
+                },
+                children: List.generate(
+                  3,
+                  (index) => Stack(
+                    children: [
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                          child: Image.asset(
+                            assets[index]['image'].toString(),
+                            height: MediaQuery.of(context).size.height * 0.5,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 14,
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                            child: Text(
+                          assets[index]['text'].toString(),
+                          style: GoogleFonts.poppins(
+                              color: Colors.black, fontSize: 22),
+                        )),
+                      )
+                    ],
+                  ),
+                )),
+            Positioned(
+                bottom: 5,
+                left: 0,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children:
+                      List.generate(3, (index) => _buildDot(current, index)),
+                ))
+          ],
+        );
+      }),
     );
   }
 
-  Positioned _buildBottom(BuildContext context) {
-    return Positioned(
-      left: 15,
-      right: 15,
-      bottom: 15,
-      child: ClipRRect(
-        borderRadius:  BorderRadius.circular(15),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-          child: Container(
-            decoration:  BoxDecoration(
-                color: Colors.white10,
-                borderRadius: BorderRadius.circular(15)),
-            child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 35),
-                child: Column(
-                  children: [
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.white,
-                      ),
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (BuildContext c) => LoginPage()));
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                              padding: const EdgeInsets.all(7),
-                              decoration: const BoxDecoration(
-                                  shape: BoxShape.circle, color: Colors.red),
-                              child: const Icon(
-                                Icons.mail,
-                                size: 20,
-                              )),
-                          Text(
-                            'Login With Email',
-                            style: GoogleFonts.roboto(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(
-                            width: 34,
-                          ),
-                        ],
-                      ),
+  Expanded _buildBottom(BuildContext context) {
+    return Expanded(
+      flex: 1,
+      child: SizedBox(
+        child: Padding(
+          padding: const EdgeInsets.only(left: 25, right: 25, top: 10),
+          child: Column(
+            children: [
+              Text(
+                'Login and Registration are free',
+                style:
+                    GoogleFonts.poppins(color: Colors.black.withOpacity(0.3)),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext c) => const LoginPage()));
+                },
+                child: Text(
+                  'Log in',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext c) => const RegisterPage()));
+                  },
+                  child: Text(
+                    'Sign up',
+                    style: GoogleFonts.poppins(color: Colors.white),
+                  )),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    height: 1,
+                    width: (MediaQuery.of(context).size.width * 0.5) - 40,
+                    color: Colors.grey,
+                  ),
+                  Text(
+                    'Or',
+                    style:
+                        GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
+                  ),
+                  Container(
+                    height: 1,
+                    width: (MediaQuery.of(context).size.width * 0.5) - 40,
+                    color: Colors.grey,
+                  ),
+                ],
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  boxShadow: <BoxShadow>[
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.4),
+                      blurRadius: 6,
+                      offset: const Offset(2, 5),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.white,
-                        ),
-                        onPressed: () {},
-                        child: Text(
-                          'Register',
-                          style: GoogleFonts.roboto(
-                              fontWeight: FontWeight.w500, color: Colors.black),
-                        ))
                   ],
-                )),
+                ),
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.white,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/google-icon.svg',
+                        width: 20,
+                        height: 20,
+                      ),
+                      const SizedBox(
+                        width: 12,
+                      ),
+                      Text(
+                        'Log in with Google',
+                        style: GoogleFonts.poppins(color: Colors.black),
+                      )
+                    ],
+                  ),
+                ),
+              )
+            ],
           ),
         ),
       ),
     );
   }
 
-  BlocBuilder _buildDot(int index) {
-    return BlocBuilder<OnboardingBloc, int>(builder: (context, count) {
+  BlocBuilder _buildDot(int current, int index) {
+    return BlocBuilder<OnboardingBloc, int>(builder: (context, current) {
       return AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         margin: const EdgeInsets.only(left: 5),
-        width: 9.5,
-        height: 9.5,
+        width: (current == index) ? 27 : 7,
+        height: 7,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
           color: ColorsWeplant.colorPrimary,

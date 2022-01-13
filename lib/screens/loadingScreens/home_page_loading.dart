@@ -43,16 +43,16 @@ class HomePageLoading extends StatelessWidget {
         vertical: 11.0,
       ),
       child: CarouselSlider.builder(
-        itemCount: 3,
+        itemCount: 1,
         itemBuilder: (BuildContext c, int index, int pageview) {
           return Image.asset(
             'assets/images/sale1.png',
           );
         },
         options: CarouselOptions(
-            initialPage: 0,
             autoPlayInterval: const Duration(seconds: 3),
-            autoPlay: true,
+            enableInfiniteScroll: false,
+            scrollPhysics: const NeverScrollableScrollPhysics(),
             viewportFraction: 1,
             aspectRatio: 1.9),
       ),
