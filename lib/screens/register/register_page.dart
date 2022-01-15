@@ -32,12 +32,6 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    Firebase.initializeApp();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {

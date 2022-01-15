@@ -124,7 +124,7 @@ class _OnBoardingpageState extends State<OnBoardingpage> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pushReplacement(
+                  Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (BuildContext c) => const LoginPage()));
