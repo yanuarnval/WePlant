@@ -35,20 +35,21 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: BlocProvider<RegisterBlocAuth>(
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
+        child: BlocProvider<RegisterBlocAuth>(
           create: (_) => RegisterBlocAuth(),
           child: BlocListener<RegisterBlocAuth, RegisterAuthState>(
             listener: (_, state) {
               if (state is FailureLoadRegisterAuthState) {
-                print('value error');
+
                 if(_statusDialogShow){
                   _showMyDialog(state.errorMessage, context);
                 }
               } else if (state is SuccesLoadRegisterAuthState) {
-                print("succes sta");
-                Navigator.push(
+
+                Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext c) => const MainScreen()));

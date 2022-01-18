@@ -1,3 +1,4 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -20,6 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _keyGlobal = GlobalKey<FormState>();
+  bool _statusDialogShow = true;
 
   @override
   void dispose() {
@@ -32,17 +34,49 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: BlocProvider<LoginBloc>(
           create: (_) => LoginBloc(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [_buildContent(), _buildBottom(context)],
+          child: BlocListener<LoginBloc, LoginAuthState>(
+            listener: (_, state) {
+              if (state is FailureLoadLoginAuthState) {
+                if (_statusDialogShow) {
+                  _showMyDialog(state.errorMessage, context);
+                }
+              } else if (state is SuccesLoadLoginAuthState) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext c) => const MainScreen()));
+              }
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [_buildContent(), _buildBottom(context)],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  Future _showMyDialog(String error, BuildContext context) {
+    return Flushbar(
+      flushbarPosition: FlushbarPosition.TOP,
+      title: "Error Message",
+      message: error,
+      backgroundColor: Colors.red,
+      duration: const Duration(seconds: 3),
+      onStatusChanged: (status) {
+        if (status == FlushbarStatus.SHOWING) {
+          _statusDialogShow = false;
+        } else if (status == FlushbarStatus.IS_HIDING) {
+          _statusDialogShow = true;
+        }
+      },
+    ).show(context);
   }
 
   Padding _buildContent() {
@@ -107,6 +141,7 @@ class _LoginPageState extends State<LoginPage> {
                 style: GoogleFonts.poppins(color: Colors.black, fontSize: 16),
                 validator: (value) {},
                 controller: _passwordController,
+                obscureText: true,
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   fillColor: ColorsWeplant.colorTextfield,

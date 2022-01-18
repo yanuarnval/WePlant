@@ -4,10 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile_flutter/bloc/login_bloc_credential.dart';
 
 import 'package:mobile_flutter/bloc/onboarding_bloc.dart';
+import 'package:mobile_flutter/model/Login_state_model.dart';
+import 'package:mobile_flutter/model/login_event.dart';
 
 import 'package:mobile_flutter/screens/login/login_page.dart';
+import 'package:mobile_flutter/screens/main_screen.dart';
 import 'package:mobile_flutter/screens/register/register_page.dart';
 
 import 'package:mobile_flutter/shared/color_weplant.dart';
@@ -38,10 +42,21 @@ class _OnBoardingpageState extends State<OnBoardingpage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: BlocProvider(
-          create: (_) => OnboardingBloc(),
-          child: BlocProvider<OnboardingBloc>(
-            create: (_) => OnboardingBloc(),
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider<OnboardingBloc>(create: (_) => OnboardingBloc()),
+            BlocProvider<LoginBlocCredential>(
+                create: (_) => LoginBlocCredential())
+          ],
+          child: BlocListener<LoginBlocCredential, LoginAuthState>(
+            listener: (_, state) {
+              if (state is SuccesLoadLoginAuthState) {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext c) => const MainScreen()));
+              }
+            },
             child: Column(
               children: [_buildSliderEvent(), _buildBottom(context)],
             ),
@@ -184,29 +199,36 @@ class _OnBoardingpageState extends State<OnBoardingpage> {
                     ),
                   ],
                 ),
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.white,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/google-icon.svg',
-                        width: 20,
-                        height: 20,
-                      ),
-                      const SizedBox(
-                        width: 12,
-                      ),
-                      Text(
-                        'Log in with Google',
-                        style: GoogleFonts.poppins(color: Colors.black),
-                      )
-                    ],
-                  ),
-                ),
+                child: BlocBuilder<LoginBlocCredential, LoginAuthState>(
+                    builder: (context, state) {
+                  return ElevatedButton(
+                    onPressed: () {
+                      context
+                          .read<LoginBlocCredential>()
+                          .add(LoginWithCredential());
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.white,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/google-icon.svg',
+                          width: 20,
+                          height: 20,
+                        ),
+                        const SizedBox(
+                          width: 12,
+                        ),
+                        Text(
+                          'Sign up with Google',
+                          style: GoogleFonts.poppins(color: Colors.black),
+                        )
+                      ],
+                    ),
+                  );
+                }),
               )
             ],
           ),

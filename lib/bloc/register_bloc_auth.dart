@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mobile_flutter/model/register_auth_state.dart';
 import 'package:mobile_flutter/model/Register_event.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterBlocAuth extends Bloc<RegisterEvent, RegisterAuthState> {
   RegisterBlocAuth() : super(InitialRegisterAuthState()) {
@@ -14,7 +15,11 @@ class RegisterBlocAuth extends Bloc<RegisterEvent, RegisterAuthState> {
           UserCredential reg = await FirebaseAuth.instance
               .createUserWithEmailAndPassword(
                   email: event.email, password: event.password);
+          if(!reg.user!.emailVerified){
+            reg.user!.sendEmailVerification();
+          }
           emit(SuccesLoadRegisterAuthState(reg.user!.uid, 'message'));
+
         } on FirebaseAuthException catch (e) {
           if (e.code == 'weak-password') {
             print('The password provided is too weak.');
@@ -26,6 +31,7 @@ class RegisterBlocAuth extends Bloc<RegisterEvent, RegisterAuthState> {
                 "The account already exists for that email"));
           }
         } catch (e) {
+          print(e);
           emit(FailureLoadRegisterAuthState('errorMessage $e'));
         }
 

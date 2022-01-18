@@ -25,7 +25,6 @@ class HomePageLoading extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 12),
-            _buildHello(),
             _buildSliderEvent(),
             _buildSearchCard(),
             _buildListCategory(),
@@ -161,15 +160,6 @@ class HomePageLoading extends StatelessWidget {
     );
   }
 
-  Padding _buildHello() {
-    return Padding(
-      padding: EdgeInsets.only(left: 14.0),
-      child: Text(
-        'Good morning',
-        style: WeplantTheme.textTheme.headline1,
-      ),
-    );
-  }
 
   SingleChildScrollView _buildSingleChildScrollView(BuildContext context) {
     return SingleChildScrollView(
