@@ -10,7 +10,7 @@ class HomeApi {
 
 
   static Future<List<ProductModel>> getAllProduct() async {
-    const urlGetAll = '${Url.url_host}products/';
+    const urlGetAll = '${Url.url_host}/products/';
     Map<String,dynamic> result;
     List<ProductModel> listProduct=[];
     final List<dynamic> jsonarray;

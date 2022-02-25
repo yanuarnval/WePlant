@@ -13,6 +13,3 @@ class Login extends LoginEvent {
   Login(this.email, this.password);
 }
 
-class LoginWithCredential extends LoginEvent{
-
-}

@@ -9,6 +9,11 @@ abstract class RegisterEvent extends Equatable{
 class Register extends RegisterEvent{
   String email;
   String password;
-  Register(this.email, this.password);
+  String name;
+  String phone;
+  Register(this.email, this.password,this.name,this.phone);
 }
 
+class RegisterWithCredential extends RegisterEvent{
+
+}

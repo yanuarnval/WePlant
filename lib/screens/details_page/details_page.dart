@@ -3,19 +3,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile_flutter/bloc/cart_bloc.dart';
 import 'package:mobile_flutter/bloc/details_bloc.dart';
+import 'package:mobile_flutter/cart/cart_page.dart';
+import 'package:mobile_flutter/model/cart_event.dart';
+import 'package:mobile_flutter/model/cart_state.dart';
 import 'package:mobile_flutter/model/details_event.dart';
 import 'package:mobile_flutter/model/details_model.dart';
 import 'package:mobile_flutter/model/details_state_model.dart';
 import 'package:mobile_flutter/model/merchant_model.dart';
+import 'package:mobile_flutter/screens/chat/message_page.dart';
 import 'package:mobile_flutter/screens/loadingScreens/details_page_loading.dart';
 import 'package:mobile_flutter/shared/color_weplant.dart';
 import 'package:mobile_flutter/theme/weplant_theme.dart';
 
 class DetailsPage extends StatefulWidget {
-  String urlProduct;
+  String idproduct;
 
-  DetailsPage({Key? key, required this.urlProduct}) : super(key: key);
+  DetailsPage({Key? key, required this.idproduct}) : super(key: key);
 
   @override
   _DetailsPageState createState() => _DetailsPageState();
@@ -23,43 +28,136 @@ class DetailsPage extends StatefulWidget {
 
 class _DetailsPageState extends State<DetailsPage> {
   int jmlhBarang = 1;
+  int _current = 0;
+  bool _isLoding = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-          child: BlocProvider<DetailsBloc>(
-            create: (_) => DetailsBloc(widget.urlProduct),
+          child: MultiBlocProvider(
+            providers: [
+              BlocProvider<DetailsBloc>(
+                  create: (_) => DetailsBloc(widget.idproduct)),
+              BlocProvider<CartBloc>(create: (_) => CartBloc())
+            ],
             child:
-            BlocBuilder<DetailsBloc, DetailsState>(builder: (context, state) {
-              if (state is InitialDetailsState) {
-                print('initialized');
-                context.read<DetailsBloc>().add(getProductById());
-              }
-              if (state is SuccesLoadAllDetailsState) {
-                return SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                    child: Column(
-                      children: [
-                        Stack(children: [
-                          _buildImageSlider(context, state.detailsModel),
-                          _buildHeader(context)
-                        ]),
-                        _buildContent(state.detailsModel, state.merchantModel),
-                      ],
-                    ),
-
-                );
-              } else {
-                return const DetailsPageLoading();
-              }
-            }),
+            BlocListener<CartBloc, CartState>(
+              listener: (context, state) {
+                if (state is LoadingCartState) {
+                  _isLoding = true;
+                }
+                if (state is SuccesLoadCartState) {
+                  _isLoding=false;
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (BuildContext c) => CartsPage()));
+                }
+              },
+              child: BlocBuilder<DetailsBloc, DetailsState>(
+                  builder: (context, state) {
+                    if (state is InitialDetailsState) {
+                      context.read<DetailsBloc>().add(getProductById());
+                    }
+                    if (state is SuccesLoadAllDetailsState) {
+                      return _buildMainContent(context, state);
+                    } else {
+                      return const DetailsPageLoading();
+                    }
+                  }),
+            ),
           )),
     );
   }
 
-  SizedBox _buildImageSlider(BuildContext context, DetailsModel detailsModel) {
-    return SizedBox(
+  Stack _buildMainContent(BuildContext context,
+      SuccesLoadAllDetailsState state) {
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            children: [
+              _buildImageSlider(context, state.detailsModel),
+              _buildContent(state.detailsModel, state.merchantModel),
+            ],
+          ),
+        ),
+        Positioned(top: 0, left: 0, right: 0, child: _buildHeader(context)),
+        buildAddCartAndChatBtn(context, state.merchantModel),
+        BlocBuilder<CartBloc, CartState>(builder: (context, state) {
+          return (_isLoding)
+              ? Container(
+            color: Colors.grey.withOpacity(0.2),
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
+              : const SizedBox();
+        })
+      ],
+    );
+  }
+
+  Positioned buildAddCartAndChatBtn(BuildContext context,
+      MerchantModel merchantModel) {
+    return Positioned(
+      bottom: 5,
+      left: 0,
+      right: 0,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: MediaQuery
+                .of(context)
+                .size
+                .width * 0.75,
+            child: BlocBuilder<CartBloc, CartState>(builder: (context, state) {
+              return ElevatedButton(
+                onPressed: () {
+                  context.read<CartBloc>().add(AddProductToCart(
+                    widget.idproduct,
+                  ));
+                },
+                child: const Text(
+                  'Add To Cart',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w600, color: Colors.white),
+                ),
+              );
+            }),
+          ),
+          const SizedBox(
+            width: 6,
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext c) =>
+                          MessagePage(
+                            emailMerchant: merchantModel.email,
+                          )));
+            },
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: const BoxDecoration(
+                  color: ColorsWeplant.colorPrimary, shape: BoxShape.circle),
+              child: Image.asset(
+                'assets/images/chat_icon.png',
+                width: 24,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Container _buildImageSlider(BuildContext context, DetailsModel detailsModel) {
+    return Container(
+      margin: const EdgeInsets.only(top: 48),
       width: MediaQuery
           .of(context)
           .size
@@ -68,14 +166,45 @@ class _DetailsPageState extends State<DetailsPage> {
           .of(context)
           .size
           .height * 0.5,
-      child: PageView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: 3,
-          itemBuilder: (context, index) =>
-              Image.network(
-                detailsModel.main_image['url'],
-                fit: BoxFit.contain,
-              )),
+      child: Stack(
+        children: [
+          PageView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: detailsModel.images!.length,
+            onPageChanged: (index) {
+              setState(() {
+                _current = index;
+              });
+            },
+            itemBuilder: (context, index) =>
+                Image.network(
+                  detailsModel.images?[index]['url'],
+                  fit: BoxFit.cover,
+                ),
+          ),
+          Positioned(
+            bottom: 5,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                  detailsModel.images!.length,
+                      (index) =>
+                      Container(
+                        width: 10,
+                        height: 10,
+                        margin: const EdgeInsets.only(right: 5),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: (_current == index)
+                                ? Colors.white
+                                : Colors.white30),
+                      )),
+            ),
+          )
+        ],
+      ),
     );
   }
 
@@ -97,11 +226,11 @@ class _DetailsPageState extends State<DetailsPage> {
         children: [
           Text(
             detailsModel.categories.toString(),
-            style: WeplantTheme.textTheme.headline3,
+            style: const TextStyle(fontSize: 16),
           ),
           Text(
             detailsModel.name,
-            style: WeplantTheme.textTheme.headline2,
+            style: const TextStyle(fontSize: 20),
           ),
           const SizedBox(
             height: 20,
@@ -114,47 +243,6 @@ class _DetailsPageState extends State<DetailsPage> {
                       color: ColorsWeplant.colorPrimary,
                       fontWeight: FontWeight.w600,
                       fontSize: 18)),
-              Container(
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  border:
-                  Border.all(width: 2, color: ColorsWeplant.colorSearchBox),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                        onPressed: () {},
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        icon: const FaIcon(
-                          FontAwesomeIcons.minus,
-                          size: 14,
-                          color: ColorsWeplant.colorPrimary,
-                        )),
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    Text(
-                      '$jmlhBarang',
-                      style: GoogleFonts.workSans(
-                          fontWeight: FontWeight.w600, fontSize: 16),
-                    ),
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    IconButton(
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        onPressed: () {},
-                        icon: const FaIcon(
-                          FontAwesomeIcons.plus,
-                          size: 14,
-                          color: ColorsWeplant.colorPrimary,
-                        ))
-                  ],
-                ),
-              )
             ],
           ),
           const SizedBox(
@@ -186,62 +274,43 @@ class _DetailsPageState extends State<DetailsPage> {
                   children: [
                     Text(
                       merchantModel.name,
-                      style: WeplantTheme.textTheme.subtitle1,
                     ),
                     Text(
                       merchantModel.address['city'],
-                      style: WeplantTheme.textTheme.subtitle1,
                     )
                   ],
                 ),
-                const Spacer(),
-                GestureDetector(
-                  onTap: () {},
-                  child: Card(
-                    elevation: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.all(3),
-                      child: SvgPicture.asset(
-                        'assets/icons/message-circle.svg',
-                        width: 36,
-                        height: 36,
-                      ),
-                    ),
-                  ),
-                )
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Text('Description',style: WeplantTheme.textTheme.headline3,),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 20),
+            child: Text('Description'),
           ),
-
           Text(detailsModel.description)
         ],
       ),
     );
   }
 
-  Positioned _buildHeader(BuildContext context) {
-    return Positioned(
-        left: 14.0,
-        top: 23,
-        right: 14.0,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: SvgPicture.asset('assets/icons/chevron-left.svg'),
-            ),
-            IconButton(
-              onPressed: () {},
-              icon: SvgPicture.asset('assets/icons/shopping-bag.svg'),
-            )
-          ],
-        ));
+  Container _buildHeader(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: SvgPicture.asset('assets/icons/chevron-left.svg'),
+          ),
+          IconButton(
+            onPressed: () {},
+            icon: SvgPicture.asset('assets/icons/shopping-bag.svg'),
+          )
+        ],
+      ),
+    );
   }
 }

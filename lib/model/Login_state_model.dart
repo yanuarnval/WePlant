@@ -6,14 +6,9 @@ class LoadingLoginAuthState extends LoginAuthState {}
 
 class SuccesLoadLoginAuthState extends LoginAuthState {
   final String token;
-  final String message;
 
-  SuccesLoadLoginAuthState(this.token, this.message);
+  SuccesLoadLoginAuthState(this.token);
 
-  @override
-  String toString() {
-    return 'SuccessLoadAllProductState{listProfiles: $token, message: $message}';
-  }
 }
 
 class FailureLoadLoginAuthState extends LoginAuthState {

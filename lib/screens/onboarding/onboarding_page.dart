@@ -1,17 +1,11 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mobile_flutter/bloc/login_bloc_credential.dart';
 
 import 'package:mobile_flutter/bloc/onboarding_bloc.dart';
-import 'package:mobile_flutter/model/Login_state_model.dart';
-import 'package:mobile_flutter/model/login_event.dart';
 
 import 'package:mobile_flutter/screens/login/login_page.dart';
-import 'package:mobile_flutter/screens/main_screen.dart';
+
 import 'package:mobile_flutter/screens/register/register_page.dart';
 
 import 'package:mobile_flutter/shared/color_weplant.dart';
@@ -26,9 +20,15 @@ class OnBoardingpage extends StatefulWidget {
 class _OnBoardingpageState extends State<OnBoardingpage> {
   final _pageViewController = PageController();
   List<Map<String, String>> assets = [
-    {"image": 'assets/images/login-page2.png', "text": "lorem ipsum dolor sit"},
-    {"image": 'assets/images/login-page1.png', "text": "lorem ipsum dolor sit"},
-    {"image": 'assets/images/login-page3.png', "text": "lorem ipsum dolor sit"}
+    {"image": 'assets/images/login-page2.png', "text": "Pesan Dari Rumah"},
+    {
+      "image": 'assets/images/login-page1.png',
+      "text": "Rawat Tanaman Dengan Hati"
+    },
+    {
+      "image": 'assets/images/login-page3.png',
+      "text": "Chat Langsung Dengan Penjual"
+    }
   ];
 
   @override
@@ -41,25 +41,12 @@ class _OnBoardingpageState extends State<OnBoardingpage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: MultiBlocProvider(
-          providers: [
-            BlocProvider<OnboardingBloc>(create: (_) => OnboardingBloc()),
-            BlocProvider<LoginBlocCredential>(
-                create: (_) => LoginBlocCredential())
-          ],
-          child: BlocListener<LoginBlocCredential, LoginAuthState>(
-            listener: (_, state) {
-              if (state is SuccesLoadLoginAuthState) {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext c) => const MainScreen()));
-              }
-            },
-            child: Column(
-              children: [_buildSliderEvent(), _buildBottom(context)],
-            ),
+        child: BlocProvider<OnboardingBloc>(
+          create: (_) => OnboardingBloc(),
+          child: Column(
+            children: [_buildSliderEvent(), _buildBottom(context)],
           ),
         ),
       ),
@@ -134,9 +121,7 @@ class _OnBoardingpageState extends State<OnBoardingpage> {
                 style:
                     GoogleFonts.poppins(color: Colors.black.withOpacity(0.3)),
               ),
-              const SizedBox(
-                height: 10,
-              ),
+              const Spacer(),
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
@@ -145,14 +130,14 @@ class _OnBoardingpageState extends State<OnBoardingpage> {
                           builder: (BuildContext c) => const LoginPage()));
                 },
                 child: Text(
-                  'Log in',
+                  'Login',
                   style: GoogleFonts.poppins(
                     color: Colors.white,
                   ),
                 ),
               ),
               const SizedBox(
-                height: 10,
+                height: 5,
               ),
               ElevatedButton(
                   onPressed: () {
@@ -165,71 +150,7 @@ class _OnBoardingpageState extends State<OnBoardingpage> {
                     'Sign up',
                     style: GoogleFonts.poppins(color: Colors.white),
                   )),
-              const SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    height: 1,
-                    width: (MediaQuery.of(context).size.width * 0.5) - 40,
-                    color: Colors.grey,
-                  ),
-                  Text(
-                    'Or',
-                    style:
-                        GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
-                  ),
-                  Container(
-                    height: 1,
-                    width: (MediaQuery.of(context).size.width * 0.5) - 40,
-                    color: Colors.grey,
-                  ),
-                ],
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                  boxShadow: <BoxShadow>[
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.4),
-                      blurRadius: 6,
-                      offset: const Offset(2, 5),
-                    ),
-                  ],
-                ),
-                child: BlocBuilder<LoginBlocCredential, LoginAuthState>(
-                    builder: (context, state) {
-                  return ElevatedButton(
-                    onPressed: () {
-                      context
-                          .read<LoginBlocCredential>()
-                          .add(LoginWithCredential());
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          'assets/icons/google-icon.svg',
-                          width: 20,
-                          height: 20,
-                        ),
-                        const SizedBox(
-                          width: 12,
-                        ),
-                        Text(
-                          'Sign up with Google',
-                          style: GoogleFonts.poppins(color: Colors.black),
-                        )
-                      ],
-                    ),
-                  );
-                }),
-              )
+              const Spacer()
             ],
           ),
         ),

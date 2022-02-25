@@ -1,7 +1,9 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile_flutter/screens/chat/list_user_page.dart';
 import 'package:mobile_flutter/shared/color_weplant.dart';
 
 import 'package:mobile_flutter/theme/weplant_theme.dart';
@@ -160,7 +162,6 @@ class HomePageLoading extends StatelessWidget {
     );
   }
 
-
   SingleChildScrollView _buildSingleChildScrollView(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -261,9 +262,9 @@ class HomePageLoading extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.only(left: 5),
                     width: MediaQuery.of(context).size.width * 0.44,
-                    child: Text(
+                    child: const Text(
                       'Best plant of week',
-                      style: WeplantTheme.textTheme.headline1,
+                      style: TextStyle(fontSize: 16),
                     ),
                   ),
                   Column(
@@ -301,47 +302,57 @@ class HomePageLoading extends StatelessWidget {
                                                 0.4,
                                       ),
                                     ),
-                                    const SizedBox(height: 6,),
-                                    SkeletonAnimation(
-                                      shimmerColor: Colors.grey,
-                                      child: Container(
-                                        height: 30,
-                                        width: MediaQuery.of(context).size.width * 0.35,
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10.0),
-                                            color: Colors.grey[300]),
-                                      )
-                                    ),
                                     const SizedBox(
                                       height: 6,
                                     ),
                                     SkeletonAnimation(
-                                      shimmerColor: Colors.grey,
-                                      child:  Container(
-                                        height: 30,
-                                        width: MediaQuery.of(context).size.width * 0.35,
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10.0),
-                                            color: Colors.grey[300]),
-                                      )
+                                        shimmerColor: Colors.grey,
+                                        child: Container(
+                                          height: 30,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.35,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                              color: Colors.grey[300]),
+                                        )),
+                                    const SizedBox(
+                                      height: 6,
                                     ),
+                                    SkeletonAnimation(
+                                        shimmerColor: Colors.grey,
+                                        child: Container(
+                                          height: 30,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.35,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                              color: Colors.grey[300]),
+                                        )),
                                     const SizedBox(
                                       height: 3,
                                     ),
                                     SkeletonAnimation(
-                                      shimmerColor: Colors.grey,
-                                      child:  Container(
-                                        height: 30,
-                                        width: MediaQuery.of(context).size.width * 0.35,
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10.0),
-                                            color: Colors.grey[300]),
-                                      )
-                                    ),
+                                        shimmerColor: Colors.grey,
+                                        child: Container(
+                                          height: 30,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.35,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                              color: Colors.grey[300]),
+                                        )),
                                     const SizedBox(
                                       height: 6,
                                     ),
-
                                   ],
                                 ),
                               ),
@@ -385,47 +396,54 @@ class HomePageLoading extends StatelessWidget {
                                               0.4,
                                     ),
                                   ),
-                                  const SizedBox(height: 6,),
-                                  SkeletonAnimation(
-                                    shimmerColor: Colors.grey,
-                                    child:  Container(
-                                      height: 30,
-                                      width: MediaQuery.of(context).size.width * 0.35,
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10.0),
-                                          color: Colors.grey[300]),
-                                    )
-                                  ),
                                   const SizedBox(
                                     height: 6,
                                   ),
                                   SkeletonAnimation(
                                       shimmerColor: Colors.grey,
-                                      child:
-                                      Container(
+                                      child: Container(
                                         height: 30,
-                                        width: MediaQuery.of(context).size.width * 0.35,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.35,
                                         decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10.0),
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                            color: Colors.grey[300]),
+                                      )),
+                                  const SizedBox(
+                                    height: 6,
+                                  ),
+                                  SkeletonAnimation(
+                                      shimmerColor: Colors.grey,
+                                      child: Container(
+                                        height: 30,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.35,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
                                             color: Colors.grey[300]),
                                       )),
                                   const SizedBox(
                                     height: 3,
                                   ),
                                   SkeletonAnimation(
-                                    shimmerColor: Colors.grey,
-                                    child:  Container(
-                                      height: 30,
-                                      width: MediaQuery.of(context).size.width * 0.35,
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10.0),
-                                          color: Colors.grey[300]),
-                                    )
-                                  ),
+                                      shimmerColor: Colors.grey,
+                                      child: Container(
+                                        height: 30,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.35,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                            color: Colors.grey[300]),
+                                      )),
                                   const SizedBox(
                                     height: 6,
                                   ),
-
                                 ],
                               ),
                             ),

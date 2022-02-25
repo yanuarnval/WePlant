@@ -5,7 +5,7 @@ import 'package:mobile_flutter/screens/splash_screen.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_flutter/theme/weplant_theme.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const WePlant());

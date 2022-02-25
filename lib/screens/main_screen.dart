@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mobile_flutter/screens/favorit_page.dart';
 import 'package:mobile_flutter/screens/home/home_page.dart';
-import 'package:mobile_flutter/screens/keranjang.dart';
-import 'package:mobile_flutter/screens/profil_page.dart';
+import 'package:mobile_flutter/cart/cart_page.dart';
+import 'package:mobile_flutter/screens/profil/profil_page.dart';
 import 'package:mobile_flutter/shared/color_weplant.dart';
 
 class MainScreen extends StatefulWidget {
@@ -19,9 +19,10 @@ class _MainScreenState extends State<MainScreen> {
   static List<Widget> pages = <Widget>[
     const HomePage(),
     const FavoritPage(),
-    const KeranjangPage(),
+    const CartsPage(),
     const ProfilPage()
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,13 +64,29 @@ class _MainScreenState extends State<MainScreen> {
               type: BottomNavigationBarType.fixed,
               items: const [
                 BottomNavigationBarItem(
-                    label: "", icon: FaIcon(FontAwesomeIcons.store,size: 20,)),
+                    label: "",
+                    icon: FaIcon(
+                      FontAwesomeIcons.store,
+                      size: 20,
+                    )),
                 BottomNavigationBarItem(
-                    label: "", icon: FaIcon(FontAwesomeIcons.shoppingBag,size: 20,)),
+                    label: "",
+                    icon: FaIcon(
+                      FontAwesomeIcons.newspaper,
+                      size: 20,
+                    )),
                 BottomNavigationBarItem(
-                    label: "", icon: FaIcon(FontAwesomeIcons.newspaper,size: 20,)),
+                    label: "",
+                    icon: FaIcon(
+                      FontAwesomeIcons.shoppingBag,
+                      size: 20,
+                    )),
                 BottomNavigationBarItem(
-                    label: "", icon: FaIcon(FontAwesomeIcons.userAlt,size: 20,)),
+                    label: "",
+                    icon: FaIcon(
+                      FontAwesomeIcons.userAlt,
+                      size: 20,
+                    )),
               ],
               currentIndex: _selectedPage,
               onTap: onItemTapped),

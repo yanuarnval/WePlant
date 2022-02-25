@@ -11,6 +11,7 @@ class DetailsBloc extends Bloc<DetailsEvent, DetailsState> {
     on<DetailsEvent>((event, emit) async {
       emit(LoadingDetailsState());
       if (event is getProductById) {
+        print(id);
         final result = await DetailsApi.getProductById(id);
         if (result.name.isEmpty) {
           emit(FailureLoadDetailsState('$result'));

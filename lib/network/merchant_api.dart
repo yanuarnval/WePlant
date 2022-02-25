@@ -6,10 +6,11 @@ import 'package:mobile_flutter/model/merchant_model.dart';
 import 'package:mobile_flutter/shared/url.dart';
 
 class MerchantApi{
-  static const urlMerchant = '${Url.url_host}merchants/';
+  static const urlMerchant = '${Url.url_host}/merchants/';
 
   static Future<MerchantModel> getMerchantById(String idMerchant) async {
     final urlId = urlMerchant + idMerchant;
+    print(urlId);
     Map<String,dynamic> result,data;
     final response = await http.get(Uri.parse(urlId));
     if (response.statusCode == 200) {
@@ -21,4 +22,5 @@ class MerchantApi{
       throw HttpException('error code $e');
     }
   }
+
 }

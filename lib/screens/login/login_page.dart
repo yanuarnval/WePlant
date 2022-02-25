@@ -9,6 +9,7 @@ import 'package:mobile_flutter/model/login_event.dart';
 import 'package:mobile_flutter/screens/main_screen.dart';
 import 'package:mobile_flutter/shared/color_weplant.dart';
 import 'package:mobile_flutter/theme/weplant_theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -22,6 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   final _keyGlobal = GlobalKey<FormState>();
   bool _statusDialogShow = true;
+  bool _isLoding = false;
 
   @override
   void dispose() {
@@ -34,27 +36,52 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: BlocProvider<LoginBloc>(
           create: (_) => LoginBloc(),
           child: BlocListener<LoginBloc, LoginAuthState>(
-            listener: (_, state) {
+            listener: (_, state) async {
+              if (state is LoadingLoginAuthState) {
+                print('loading');
+                _isLoding = true;
+              }
               if (state is FailureLoadLoginAuthState) {
                 if (_statusDialogShow) {
                   _showMyDialog(state.errorMessage, context);
                 }
               } else if (state is SuccesLoadLoginAuthState) {
-                Navigator.push(
+                SharedPreferences pref = await SharedPreferences.getInstance();
+                await pref.setString('uid', state.token);
+                print('login');
+                Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext c) => const MainScreen()));
               }
             },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [_buildContent(), _buildBottom(context)],
+            child: Stack(
+              children: [
+                SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [_buildContent(), _buildBottom(context)],
+                  ),
+                ),
+                BlocBuilder<LoginBloc,LoginAuthState>(builder: (context, state) {
+                  return (_isLoding)
+                      ? Container(
+                    color: Colors.black.withOpacity(0.2),
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        color: ColorsWeplant.colorPrimary,
+                      ),
+                    ),
+                  )
+                      : const SizedBox.shrink();
+                })
+              ],
             ),
           ),
         ),
@@ -98,8 +125,14 @@ class _LoginPageState extends State<LoginPage> {
             Center(
               child: Image.asset(
                 'assets/images/login-image.png',
-                height: MediaQuery.of(context).size.height * 0.4,
-                width: MediaQuery.of(context).size.height * 0.4,
+                height: MediaQuery
+                    .of(context)
+                    .size
+                    .height * 0.4,
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .height * 0.4,
               ),
             ),
             const SizedBox(
@@ -179,7 +212,7 @@ class _LoginPageState extends State<LoginPage> {
                 .add(Login(_usernameController.text, _passwordController.text));
           },
           child: Text(
-            'Log in',
+            'Login',
             style: GoogleFonts.poppins(),
           ),
         );

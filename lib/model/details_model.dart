@@ -9,7 +9,7 @@ class DetailsModel {
   int stok;
   Map<String, dynamic> main_image;
   List<dynamic>? images;
-  String? categories;
+  String categories;
 
   DetailsModel(
       {required this.id,
@@ -29,13 +29,13 @@ class DetailsModel {
         id: json['id'],
         created_at: json['created_at'],
         updated_at: json['updated_at'],
-        merchant_id: json['merchant_id'],
+        merchant_id: json['merchant']['id'],
         name: json['name'],
         description: json['description'],
         price: json['price'],
         stok: json['stock'],
         main_image: json['main_image'],
         images: json['images'],
-        categories: json['categories']);
+        categories: "tanaman liar");
   }
 }

@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,6 +11,7 @@ import 'package:mobile_flutter/model/Register_event.dart';
 import 'package:mobile_flutter/screens/main_screen.dart';
 import 'package:mobile_flutter/shared/color_weplant.dart';
 import 'package:mobile_flutter/theme/weplant_theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -22,56 +24,76 @@ class _RegisterPageState extends State<RegisterPage> {
   final _formkey = GlobalKey<FormState>();
   final _userController = TextEditingController();
   final _passController = TextEditingController();
-  bool _statusDialogShow= true;
+  final _firstController = TextEditingController();
+  final _lastController = TextEditingController();
+  final _phoneController = TextEditingController();
+  bool _statusDialogShow = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
     // TODO: implement dispose
     _userController.dispose();
     _passController.dispose();
+    _firstController.dispose();
+    _lastController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: BlocProvider<RegisterBlocAuth>(
           create: (_) => RegisterBlocAuth(),
           child: BlocListener<RegisterBlocAuth, RegisterAuthState>(
-            listener: (_, state) {
+            listener: (_, state) async {
               if (state is FailureLoadRegisterAuthState) {
-
-                if(_statusDialogShow){
+                if (_statusDialogShow) {
                   _showMyDialog(state.errorMessage, context);
                 }
+                _isLoading=false;
               } else if (state is SuccesLoadRegisterAuthState) {
-
+                print('selesai');
                 Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext c) => const MainScreen()));
+              } else if (state is LoadingRegisiterAuthState) {
+                print('loading');
+                _isLoading = true;
               }
             },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: SvgPicture.asset('assets/icons/chevron-left.svg'),
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                _buildContent(),
-                const Spacer(),
-                _buildBottom(context)
-              ],
-            ),
+            child: BlocBuilder<RegisterBlocAuth, RegisterAuthState>(
+                builder: (context, state) {
+              return Stack(
+                children: [
+                  SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildContent(),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.15,
+                        ),
+                        _buildBottom(context),
+                      ],
+                    ),
+                  ),
+                  (_isLoading)
+                      ? Container(
+                          color: Colors.black.withOpacity(0.2),
+                          child: const Center(
+                            child: CircularProgressIndicator(
+                              color: ColorsWeplant.colorPrimary,
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink()
+                ],
+              );
+            }),
           ),
         ),
       ),
@@ -85,11 +107,11 @@ class _RegisterPageState extends State<RegisterPage> {
       message: error,
       backgroundColor: Colors.red,
       duration: const Duration(seconds: 3),
-      onStatusChanged: (status){
-        if(status == FlushbarStatus.SHOWING){
-            _statusDialogShow=false;
-        }else if(status == FlushbarStatus.IS_HIDING){
-          _statusDialogShow =true;
+      onStatusChanged: (status) {
+        if (status == FlushbarStatus.SHOWING) {
+          _statusDialogShow = false;
+        } else if (status == FlushbarStatus.IS_HIDING) {
+          _statusDialogShow = true;
         }
       },
     ).show(context);
@@ -105,8 +127,11 @@ class _RegisterPageState extends State<RegisterPage> {
               builder: (context, state) {
             return ElevatedButton(
                 onPressed: () {
-                  context.read<RegisterBlocAuth>().add(
-                      Register(_userController.text, _passController.text));
+                  context.read<RegisterBlocAuth>().add(Register(
+                      _userController.text,
+                      _passController.text,
+                      _firstController.text + " " + _lastController.text,
+                      _phoneController.text));
                 },
                 child: Text(
                   'Register',
@@ -133,129 +158,165 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Container _buildContent() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Register',
-            style: GoogleFonts.poppins(
-                color: Colors.black, fontSize: 30, fontWeight: FontWeight.w500),
+  Column _buildContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: SvgPicture.asset('assets/icons/chevron-left.svg'),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Register',
+                style: GoogleFonts.poppins(
+                    color: Colors.black,
+                    fontSize: 30,
+                    fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              Form(
+                key: _formkey,
+                child: Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: TextFormField(
+                        cursorColor: ColorsWeplant.colorPrimary,
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 16),
+                        validator: (value) {},
+                        controller: _firstController,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: ColorsWeplant.colorTextfield,
+                          filled: true,
+                          hintText: "First name",
+                          hintStyle: GoogleFonts.poppins(fontSize: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: TextFormField(
+                        cursorColor: ColorsWeplant.colorPrimary,
+                        style: GoogleFonts.poppins(
+                            color: Colors.black, fontSize: 16),
+                        validator: (value) {},
+                        controller: _lastController,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: ColorsWeplant.colorTextfield,
+                          filled: true,
+                          hintText: "Last name",
+                          hintStyle: GoogleFonts.poppins(fontSize: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: TextFormField(
+                        cursorColor: ColorsWeplant.colorPrimary,
+                        controller: _phoneController,
+                        style: GoogleFonts.poppins(
+                            color: Colors.black, fontSize: 16),
+                        validator: (value) {},
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: ColorsWeplant.colorTextfield,
+                          filled: true,
+                          hintText: "Phone",
+                          hintStyle: GoogleFonts.poppins(fontSize: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: TextFormField(
+                        cursorColor: ColorsWeplant.colorPrimary,
+                        controller: _userController,
+                        style: GoogleFonts.poppins(
+                            color: Colors.black, fontSize: 16),
+                        validator: (value) {},
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: ColorsWeplant.colorTextfield,
+                          filled: true,
+                          hintText: "Email",
+                          hintStyle: GoogleFonts.poppins(fontSize: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: TextFormField(
+                        cursorColor: ColorsWeplant.colorPrimary,
+                        controller: _passController,
+                        obscureText: true,
+                        style: GoogleFonts.poppins(
+                            color: Colors.black, fontSize: 16),
+                        validator: (value) {},
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: ColorsWeplant.colorTextfield,
+                          filled: true,
+                          hintText: "Password",
+                          hintStyle: GoogleFonts.poppins(fontSize: 16),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(left: 10, right: 10, top: 20),
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                                text: 'By signing you agree to our ',
+                                style: GoogleFonts.poppins(
+                                    color: ColorsWeplant.colorPrimary)),
+                            TextSpan(
+                                text: 'Term of use ',
+                                style: GoogleFonts.poppins(color: Colors.grey)),
+                            TextSpan(
+                                text: 'and ',
+                                style: GoogleFonts.poppins(
+                                    color: ColorsWeplant.colorPrimary)),
+                            TextSpan(
+                                text: 'privacy notice',
+                                style: GoogleFonts.poppins(color: Colors.grey)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
           ),
-          const SizedBox(
-            height: 16,
-          ),
-          Form(
-            key: _formkey,
-            child: Column(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: TextFormField(
-                    cursorColor: ColorsWeplant.colorPrimary,
-                    style:
-                        GoogleFonts.poppins(color: Colors.black, fontSize: 16),
-                    validator: (value) {},
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      fillColor: ColorsWeplant.colorTextfield,
-                      filled: true,
-                      hintText: "First name",
-                      hintStyle: GoogleFonts.poppins(fontSize: 16),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: TextFormField(
-                    cursorColor: ColorsWeplant.colorPrimary,
-                    style:
-                        GoogleFonts.poppins(color: Colors.black, fontSize: 16),
-                    validator: (value) {},
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      fillColor: ColorsWeplant.colorTextfield,
-                      filled: true,
-                      hintText: "Last name",
-                      hintStyle: GoogleFonts.poppins(fontSize: 16),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: TextFormField(
-                    cursorColor: ColorsWeplant.colorPrimary,
-                    controller: _userController,
-                    style:
-                        GoogleFonts.poppins(color: Colors.black, fontSize: 16),
-                    validator: (value) {},
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      fillColor: ColorsWeplant.colorTextfield,
-                      filled: true,
-                      hintText: "Email",
-                      hintStyle: GoogleFonts.poppins(fontSize: 16),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: TextFormField(
-                    cursorColor: ColorsWeplant.colorPrimary,
-                    controller: _passController,
-                    obscureText: true,
-                    style:
-                        GoogleFonts.poppins(color: Colors.black, fontSize: 16),
-                    validator: (value) {},
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      fillColor: ColorsWeplant.colorTextfield,
-                      filled: true,
-                      hintText: "Password",
-                      hintStyle: GoogleFonts.poppins(fontSize: 16),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10, right: 10, top: 20),
-                  child: RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                            text: 'By signing you agree to our ',
-                            style: GoogleFonts.poppins(
-                                color: ColorsWeplant.colorPrimary)),
-                        TextSpan(
-                            text: 'Term of use ',
-                            style: GoogleFonts.poppins(color: Colors.grey)),
-                        TextSpan(
-                            text: 'and ',
-                            style: GoogleFonts.poppins(
-                                color: ColorsWeplant.colorPrimary)),
-                        TextSpan(
-                            text: 'privacy notice',
-                            style: GoogleFonts.poppins(color: Colors.grey)),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -1,15 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:mobile_flutter/model/details_event.dart';
 import 'package:mobile_flutter/model/details_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:mobile_flutter/model/merchant_model.dart';
 import 'package:mobile_flutter/shared/url.dart';
 
 class DetailsApi {
 
-  static const urlProduct = '${Url.url_host}products/';
+  static const urlProduct = '${Url.url_host}/products/';
 
 
   static Future<DetailsModel> getProductById(String idProduct) async {
@@ -26,6 +24,10 @@ class DetailsApi {
       throw HttpException('error code $e');
     }
   }
+
+  //TODO:add post cart by item id to backend
+
+
 
 
 }
