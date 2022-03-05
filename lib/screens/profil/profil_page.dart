@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_flutter/bloc/profil_bloc.dart';
@@ -82,25 +83,154 @@ class _ProfilPageState extends State<ProfilPage> {
                   style: GoogleFonts.workSans(
                       color: Colors.black.withOpacity(0.3)),
                 )),
-                const SizedBox(height: 20,),
-                GestureDetector(onTap: () {}, child: Text('Mulai jual ?')),
-                GestureDetector(
-                  onTap: () async {
-                    SharedPreferences preferences =
-                        await SharedPreferences.getInstance();
-                    await preferences.clear();
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext c) =>
-                                const OnBoardingpage()));
-                  },
-                  child: Text('logout'),
+                const SizedBox(
+                  height: 20,
                 ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 29),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          spreadRadius: 0.5,
+                          blurRadius: 10)
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 20, horizontal: 16),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              margin: const EdgeInsets.only(right: 16),
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color: Theme.of(context).primaryColor),
+                                  borderRadius: BorderRadius.circular(40)),
+                              child: SvgPicture.asset(
+                                'assets/icons/profile.svg',
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                            Text(
+                              'My Account',
+                              style: GoogleFonts.workSans(
+                                  fontSize: 18,
+                                  color: const Color(0xff181D27),
+                                  fontWeight: FontWeight.w600),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios,
+                              color: Colors.grey,
+                              size: 18,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        color: Colors.grey,
+                        height: 1,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 20, horizontal: 16),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              margin: const EdgeInsets.only(right: 16),
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color: Theme.of(context).primaryColor),
+                                  borderRadius: BorderRadius.circular(40)),
+                              child: SvgPicture.asset(
+                                'assets/icons/setting.svg',
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                            Text(
+                              'Setting',
+                              style: GoogleFonts.workSans(
+                                  fontSize: 18,
+                                  color: const Color(0xff181D27),
+                                  fontWeight: FontWeight.w600),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios,
+                              color: Colors.grey,
+                              size: 18,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        color: Colors.grey,
+                        height: 1,
+                      ),
+                      GestureDetector(
+                        onTap: () async {
+
+                          SharedPreferences preferences =
+                              await SharedPreferences.getInstance();
+                          await preferences.clear();
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (BuildContext c) =>
+                                      const OnBoardingpage()));
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 20, horizontal: 16),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.only(
+                                    top: 13, left: 14, bottom: 15, right: 11),
+                                margin: const EdgeInsets.only(right: 16),
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Theme.of(context).primaryColor),
+                                    borderRadius: BorderRadius.circular(40)),
+                                child: SvgPicture.asset(
+                                  'assets/icons/logout.svg',
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              ),
+                              Text(
+                                'Log Out',
+                                style: GoogleFonts.workSans(
+                                    fontSize: 18,
+                                    color: const Color(0xff181D27),
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              const Spacer(),
+                              const Icon(
+                                Icons.arrow_forward_ios,
+                                color: Colors.grey,
+                                size: 18,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
               ],
             );
           }
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+              child: CircularProgressIndicator(
+            color: Theme.of(context).primaryColor,
+          ));
         }),
       )),
     );

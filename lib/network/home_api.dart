@@ -17,7 +17,7 @@ class HomeApi {
     final response = await http.get(Uri.parse(urlGetAll));
     if(response.statusCode == 200){
       result=jsonDecode(response.body);
-      jsonarray=result['data'];
+      jsonarray=result['data']['products'];
       for(int i=0;i<jsonarray.length;i++){
         listProduct.add(ProductModel.fromJson(jsonarray[i]));
       }

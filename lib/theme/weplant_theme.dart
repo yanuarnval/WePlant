@@ -5,7 +5,7 @@ import 'package:mobile_flutter/shared/color_weplant.dart';
 class WeplantTheme {
   static ThemeData Light() {
     return ThemeData(
-        textTheme: GoogleFonts.poppinsTextTheme(),
+        textTheme: GoogleFonts.workSansTextTheme(),
         brightness: Brightness.light,
         primaryColor: ColorsWeplant.colorPrimary,
         canvasColor: Colors.white,

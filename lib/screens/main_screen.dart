@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mobile_flutter/screens/favorit_page.dart';
+import 'package:mobile_flutter/bloc/for%20ui/main_screen_bloc.dart';
+import 'package:mobile_flutter/screens/transaksi_page.dart';
 import 'package:mobile_flutter/screens/home/home_page.dart';
-import 'package:mobile_flutter/cart/cart_page.dart';
+import 'package:mobile_flutter/screens/cart/cart_page.dart';
 import 'package:mobile_flutter/screens/profil/profil_page.dart';
 import 'package:mobile_flutter/shared/color_weplant.dart';
 
@@ -15,28 +17,32 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedPage = 0;
   static List<Widget> pages = <Widget>[
     const HomePage(),
-    const FavoritPage(),
-    const CartsPage(),
+    const TransaksiPage(),
+    const TransaksiPage(),
     const ProfilPage()
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          pages[_selectedPage],
-          _buildBottomNavigationbar(),
-        ],
+      body: BlocProvider<MainScreenBloc>(
+        create: (_) => MainScreenBloc(),
+        child: BlocBuilder<MainScreenBloc, int>(builder: (context, value) {
+          return Stack(
+            children: [
+              pages[value],
+              _buildBottomNavigationbar(context, value),
+            ],
+          );
+        }),
       ),
       resizeToAvoidBottomInset: false,
     );
   }
 
-  Positioned _buildBottomNavigationbar() {
+  Positioned _buildBottomNavigationbar(BuildContext context, int value) {
     return Positioned(
       bottom: 0,
       left: 0,
@@ -88,16 +94,12 @@ class _MainScreenState extends State<MainScreen> {
                       size: 20,
                     )),
               ],
-              currentIndex: _selectedPage,
-              onTap: onItemTapped),
+              currentIndex: value,
+              onTap: (index) {
+                context.read<MainScreenBloc>().changeIndex(index);
+              }),
         ),
       ),
     );
-  }
-
-  void onItemTapped(int index) {
-    setState(() {
-      _selectedPage = index;
-    });
   }
 }

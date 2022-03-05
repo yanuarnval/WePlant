@@ -31,6 +31,14 @@ class _ListUserPageState extends State<ListUserPage> {
                 if (state is InitialLoadChatUsersState) {
                   context.read<ChatUsersBloc>().add(GetUsersList());
                 }
+                if (state is EmpetyChatState) {
+                  return const Center(
+                    child: Text(
+                      'Chat Is Empety',
+                      style: TextStyle(fontSize: 18, color: Color(0xffABABAB)),
+                    ),
+                  );
+                }
                 if (state is SuccesLoadChatUsersState) {
                   return Padding(
                     padding: const EdgeInsets.only(top: 50),
@@ -72,14 +80,15 @@ class _ListUserPageState extends State<ListUserPage> {
                 child: Row(
                   children: [
                     GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: SvgPicture.asset(
-                          'assets/icons/chevron-left.svg',
-                          width: 26,
-                          height: 26,
-                        )),
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: SvgPicture.asset(
+                        'assets/icons/chevron-left.svg',
+                        width: 26,
+                        height: 26,
+                      ),
+                    ),
                     const SizedBox(
                       width: 14,
                     ),

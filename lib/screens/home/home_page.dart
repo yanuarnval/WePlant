@@ -96,26 +96,38 @@ class _HomePageState extends State<HomePage> {
   Container _buildMostwanted(
       BuildContext context, List<ProductModel> listMostwanted) {
     return Container(
-      margin: const EdgeInsets.only(left: 12, right: 12, bottom: 60),
+      margin: const EdgeInsets.only(left: 12, right: 12, bottom: 60, top: 15),
       child: Column(
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.only(left: 5),
+                width: MediaQuery.of(context).size.width * 0.44,
+                child: const Text(
+                  'Most Wanted',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+                ),
+              ),
+              TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    'See',
+                    style: TextStyle(
+                        fontSize: 17, color: Theme.of(context).primaryColor),
+                  ))
+            ],
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Column(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.only(left: 5),
-                    width: MediaQuery.of(context).size.width * 0.44,
-                    child: const Text(
-                      'Best plant of week',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
                   Column(
                     children: List.generate(
-                        4,
+                        listMostwanted.length,
                         (index) => GestureDetector(
                               onTap: () {},
                               child: Container(
@@ -141,8 +153,7 @@ class _HomePageState extends State<HomePage> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Image.network(
-                                        listMostwanted[index]
-                                            .imagesModel['url'],
+                                        listMostwanted[index].imagesModel,
                                         width:
                                             MediaQuery.of(context).size.width *
                                                 0.6,
@@ -204,7 +215,7 @@ class _HomePageState extends State<HomePage> {
               ),
               Column(
                 children: List.generate(
-                    4,
+                    listMostwanted.length,
                     (index) => GestureDetector(
                           onTap: () {},
                           child: Container(
@@ -230,7 +241,7 @@ class _HomePageState extends State<HomePage> {
                                   Image.network(
                                     listMostwanted[
                                             (listMostwanted.length - 1) - index]
-                                        .imagesModel['url'],
+                                        .imagesModel,
                                     width:
                                         MediaQuery.of(context).size.width * 0.6,
                                     height:
@@ -346,94 +357,101 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  SingleChildScrollView _buildCategoryItem(
+  Container _buildCategoryItem(
       BuildContext context, List<ProductModel> listProduct) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.45 * listProduct.length,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: List.generate(
-            listProduct.length,
-            (index) => GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => DetailsPage(
-                              idproduct: listProduct[index].id,
-                            )));
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.4,
-                height: 280,
-                margin: const EdgeInsets.only(top: 15, bottom: 25),
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(24)),
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        spreadRadius: 5,
-                        blurRadius: 15,
-                        offset: const Offset(0, 9))
+    return Container(
+      color: Colors.white,
+      height: 350,
+      child: ListView.builder(
+        physics: const BouncingScrollPhysics(),
+        itemCount: listProduct.length,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: ((BuildContext c, i) {
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext c) =>
+                          DetailsPage(idproduct: listProduct[i].id)));
+            },
+            child: Container(
+              margin: EdgeInsets.only(
+                  top: 10,
+                  bottom: 30,
+                  left: 15,
+                  right: (i == listProduct.length) ? 15 : 0),
+              width: 180,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(16)),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 3,
+                      blurRadius: 15,
+                      offset: const Offset(0, 9))
+                ],
+              ),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Image.network(
+                      listProduct[i].imagesModel,
+                      fit: BoxFit.cover,
+                      width: 160,
+                      height: 160,
+                    ),
+                    const Spacer(),
+                    Text(
+                      (listProduct[i].name.length >= 15)
+                          ? listProduct[i].name.substring(0, 15)
+                          : listProduct[i].name,
+                      style: GoogleFonts.workSans(
+                          color: const Color(0xff24243F),
+                          fontSize: 22,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    const Spacer(),
+                    Text(
+                      (listProduct[i].description.length >= 47)
+                          ? listProduct[i].description.substring(0, 47).trim() +
+                              '...'
+                          : listProduct[i].description,
+                      style: GoogleFonts.workSans(
+                          color: const Color(0xff888E9A),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    const SizedBox(
+                      height: 6,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'stock(${listProduct[i].stock})',
+                          style: const TextStyle(
+                              color: Color(0xff24243F), fontSize: 12),
+                        ),
+                        Text(
+                          'IDR ${listProduct[i].price}',
+                          style: GoogleFonts.workSans(
+                              fontWeight: FontWeight.w600,
+                              color: ColorsWeplant.colorPrimary,
+                              fontSize: 14),
+                        ),
+                      ],
+                    )
                   ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Image.network(
-                        listProduct[index].imagesModel['url'],
-                        width: MediaQuery.of(context).size.width * 0.6,
-                        height: MediaQuery.of(context).size.width * 0.4,
-                        fit: BoxFit.contain,
-                      ),
-                      const Text(
-                        'Indoor',
-                      ),
-                      Text((listProduct[index].name.length > 18 ||
-                              listProduct[index].name.length == 18)
-                          ? listProduct[index].name.substring(0, 15) + "..."
-                          : listProduct[index].name),
-                      const SizedBox(
-                        height: 5.0,
-                      ),
-                      Text(
-                        'Rp${listProduct[index].price}',
-                        style: GoogleFonts.workSans(
-                            fontWeight: FontWeight.w600,
-                            color: ColorsWeplant.colorPrimary,
-                            fontSize: 13),
-                      ),
-                      const SizedBox(
-                        height: 6,
-                      ),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.person,
-                            size: 22,
-                          ),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            "kota jakarta${index}",
-                            style: const TextStyle(fontSize: 10),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
                 ),
               ),
             ),
-          ),
-        ),
+          );
+        }),
       ),
     );
   }

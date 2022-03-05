@@ -77,57 +77,34 @@ class DetailsPageLoading extends StatelessWidget {
             const SizedBox(
               height: 25,
             ),
-            Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(30),
-                    child: SkeletonAnimation(
-                      shimmerColor: Colors.grey,
-                      child: Container(
-                        width: 60,
-                        height: 60,
-                        color: Colors.grey[300],
-                      ),
+            Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(30),
+                  child: SkeletonAnimation(
+                    shimmerColor: Colors.grey,
+                    child: Container(
+                      width: 60,
+                      height: 60,
+                      color: Colors.grey[300],
                     ),
                   ),
-                  const SizedBox(
-                    width: 10,
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                SkeletonAnimation(
+                  shimmerColor: Colors.grey,
+                  child: Container(
+                    height: 30,
+                    width: MediaQuery.of(context).size.width * 0.45,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        color: Colors.grey[300]),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SkeletonAnimation(
-                        shimmerColor: Colors.grey,
-                        child: Container(
-                          height: 30,
-                          width: MediaQuery.of(context).size.width * 0.45,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10.0),
-                              color: Colors.grey[300]),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Card(
-                      elevation: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.all(3),
-                        child: SvgPicture.asset(
-                          'assets/icons/message-circle.svg',
-                          width: 36,
-                          height: 36,
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
+                ),
+
+              ],
             ),
           ],
         ),

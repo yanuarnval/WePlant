@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:mobile_flutter/model/merchant_model.dart';
+import 'package:mobile_flutter/model/cart_model.dart';
 
 abstract class CartState extends Equatable {
   @override
@@ -10,12 +10,18 @@ abstract class CartState extends Equatable {
 class InitialCartLoadState extends CartState {}
 
 class SuccesLoadCartState extends CartState {
+  List<CartModel> listProducts;
 
+  SuccesLoadCartState(this.listProducts);
 }
 
-class LoadingCartState extends CartState{
+class SuccesLoadPostCartState extends CartState {
+  String status;
 
+  SuccesLoadPostCartState(this.status);
 }
+
+class LoadingCartState extends CartState {}
 
 class FailureLoadCartState extends CartState {
   final String errorMessage;

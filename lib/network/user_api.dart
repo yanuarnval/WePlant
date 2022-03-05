@@ -11,21 +11,21 @@ class UserApi {
 
   Future<UserModel> userRegister(
       String email, String name, String password, String phone) async {
+    print(urlRegister);
     final response = await http.post(Uri.parse(urlRegister),
-        body: jsonEncode(<String, String>{
+        body: jsonEncode({
           "email": email,
           "password": password,
           "user_name": name,
           "phone": phone
         }));
-
+    Map<String, dynamic> decode = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      Map<String, dynamic> decode = jsonDecode(response.body);
-      print('res 200');
       return UserModel.jsonFrom(decode['data']);
     } else {
+      print(decode);
       final e = response.statusCode;
-      throw HttpException('error code $e');
+      throw HttpException('$e');
     }
   }
 

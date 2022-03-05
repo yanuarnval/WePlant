@@ -15,3 +15,9 @@ class AddProductToCart extends CartEvent {
 class GetProductsFromCart extends CartEvent{
 
 }
+
+class RemoveProductFromCart extends CartEvent{
+  String productId;
+
+  RemoveProductFromCart(this.productId);
+}

@@ -14,8 +14,7 @@ class CartApi {
   static Future<String> postProductToCart(
       String idProduct, String token, String idCustomer) async {
     final urlId = urlProduct + idCustomer;
-    Map<String, dynamic> result;
-
+    Map<String, dynamic> result = {};
     final response = await http.post(
       Uri.parse(urlId),
       headers: {
@@ -25,13 +24,12 @@ class CartApi {
       },
       body: jsonEncode(<String, String>{"product_id": idProduct}),
     );
-
+    result = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      result = jsonDecode(response.body);
-      return result['data']['product_id'];
+      print(response.statusCode);
+      return result['status'];
     } else {
-      final e = response.statusCode;
-      throw HttpException('error code $e');
+      throw HttpException(result['data']);
     }
   }
 
@@ -51,15 +49,55 @@ class CartApi {
 
     if (response.statusCode == 200) {
       result = jsonDecode(response.body);
-      List products=result['data']['products'];
-      List<CartModel> product=[];
-      for(int i=0;i<products.length;i++){
-        product.add(CartModel.fromjson(products[i]));
+      List products = [];
+      List<CartModel> product = [];
+      print(result['data']['products']);
+      if (result['data']['products'] != null) {
+        products = result['data']['products'];
+        for (int i = 0; i < products.length; i++) {
+          product.add(CartModel.fromjson(products[i]));
+        }
+        return product;
       }
       return product;
     } else {
       final e = response.statusCode;
       throw HttpException('error code $e');
+    }
+  }
+
+  Future<String> removeProductFromCart(
+      String customerId, String productId, String token) async {
+    final url =
+        Uri.parse(urlProduct + '$customerId' + '/products' + '/$productId');
+    final response = await http.delete(url, headers: <String, String>{
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    });
+    if (response.statusCode == 200) {
+      return 'Cart Products remove';
+    } else {
+      throw (response.statusCode.toString());
+    }
+  }
+
+  Future<int> updateQuantityProduct(
+      String customerId, String productId, String token, int quantity) async {
+    final url =
+        Uri.parse(urlProduct + '$customerId' + '/products' + '/$productId');
+    final response = await http.patch(url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'quantity': quantity}));
+    if (response.statusCode == 200) {
+      final r= jsonDecode(response.body);
+      return r['data']['quantity'];
+    } else {
+      throw (response.statusCode.toString());
     }
   }
 }

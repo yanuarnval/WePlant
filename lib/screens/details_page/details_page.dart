@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_flutter/bloc/cart_bloc.dart';
 import 'package:mobile_flutter/bloc/details_bloc.dart';
-import 'package:mobile_flutter/cart/cart_page.dart';
+import 'package:mobile_flutter/screens/cart/cart_page.dart';
 import 'package:mobile_flutter/model/cart_event.dart';
 import 'package:mobile_flutter/model/cart_state.dart';
 import 'package:mobile_flutter/model/details_event.dart';
@@ -36,70 +36,88 @@ class _DetailsPageState extends State<DetailsPage> {
     return Scaffold(
       body: SafeArea(
           child: MultiBlocProvider(
-            providers: [
-              BlocProvider<DetailsBloc>(
-                  create: (_) => DetailsBloc(widget.idproduct)),
-              BlocProvider<CartBloc>(create: (_) => CartBloc())
-            ],
-            child:
-            BlocListener<CartBloc, CartState>(
-              listener: (context, state) {
-                if (state is LoadingCartState) {
-                  _isLoding = true;
-                }
-                if (state is SuccesLoadCartState) {
-                  _isLoding=false;
-                  Navigator.push(context, MaterialPageRoute(
-                      builder: (BuildContext c) => CartsPage()));
-                }
-              },
-              child: BlocBuilder<DetailsBloc, DetailsState>(
-                  builder: (context, state) {
-                    if (state is InitialDetailsState) {
-                      context.read<DetailsBloc>().add(getProductById());
-                    }
-                    if (state is SuccesLoadAllDetailsState) {
-                      return _buildMainContent(context, state);
-                    } else {
-                      return const DetailsPageLoading();
-                    }
-                  }),
-            ),
-          )),
+        providers: [
+          BlocProvider<DetailsBloc>(
+              create: (_) => DetailsBloc(widget.idproduct)),
+          BlocProvider<CartBloc>(create: (_) => CartBloc())
+        ],
+        child: BlocListener<CartBloc, CartState>(
+          listener: (context, state) {
+            if (state is LoadingCartState) {
+              _isLoding = true;
+            }
+            if (state is FailureLoadCartState) {
+              _isLoding = false;
+              _showDialog(state.errorMessage);
+            }
+            if (state is SuccesLoadPostCartState) {
+              _isLoding = false;
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext c) => const CartsPage()));
+            }if(state is SuccesLoadCartState){
+              _isLoding=false;
+            }
+          },
+          child:
+              BlocBuilder<DetailsBloc, DetailsState>(builder: (context, state) {
+            if (state is InitialDetailsState) {
+              context.read<DetailsBloc>().add(getProductById());
+              context.read<CartBloc>().add(GetProductsFromCart());
+            }
+            if (state is SuccesLoadAllDetailsState) {
+              print(state.detailsModel.images![0]);
+              return _buildMainContent(context, state);
+            } else {
+              return const DetailsPageLoading();
+            }
+          }),
+        ),
+      )),
     );
   }
 
-  Stack _buildMainContent(BuildContext context,
-      SuccesLoadAllDetailsState state) {
+  Stack _buildMainContent(
+      BuildContext context, SuccesLoadAllDetailsState state) {
     return Stack(
       children: [
         SingleChildScrollView(
           scrollDirection: Axis.vertical,
-          child: Column(
+          child: Stack(
             children: [
-              _buildImageSlider(context, state.detailsModel),
-              _buildContent(state.detailsModel, state.merchantModel),
+              Column(
+                children: [
+                  _buildHeader(context),
+                  _buildImageSlider(context, state.detailsModel),
+                ],
+              ),
+              Positioned(
+                  top: MediaQuery.of(context).size.height * 0.64,
+                  left: 0,
+                  right: 0,
+                  child:
+                      _buildContent(state.detailsModel, state.merchantModel)),
             ],
           ),
         ),
-        Positioned(top: 0, left: 0, right: 0, child: _buildHeader(context)),
         buildAddCartAndChatBtn(context, state.merchantModel),
         BlocBuilder<CartBloc, CartState>(builder: (context, state) {
           return (_isLoding)
               ? Container(
-            color: Colors.grey.withOpacity(0.2),
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
-          )
+                  color: Colors.grey.withOpacity(0.2),
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
               : const SizedBox();
         })
       ],
     );
   }
 
-  Positioned buildAddCartAndChatBtn(BuildContext context,
-      MerchantModel merchantModel) {
+  Positioned buildAddCartAndChatBtn(
+      BuildContext context, MerchantModel merchantModel) {
     return Positioned(
       bottom: 5,
       left: 0,
@@ -108,16 +126,13 @@ class _DetailsPageState extends State<DetailsPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-            width: MediaQuery
-                .of(context)
-                .size
-                .width * 0.75,
+            width: MediaQuery.of(context).size.width * 0.75,
             child: BlocBuilder<CartBloc, CartState>(builder: (context, state) {
               return ElevatedButton(
                 onPressed: () {
                   context.read<CartBloc>().add(AddProductToCart(
-                    widget.idproduct,
-                  ));
+                        widget.idproduct,
+                      ));
                 },
                 child: const Text(
                   'Add To Cart',
@@ -135,8 +150,7 @@ class _DetailsPageState extends State<DetailsPage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (BuildContext c) =>
-                          MessagePage(
+                      builder: (BuildContext c) => MessagePage(
                             emailMerchant: merchantModel.email,
                           )));
             },
@@ -155,52 +169,47 @@ class _DetailsPageState extends State<DetailsPage> {
     );
   }
 
-  Container _buildImageSlider(BuildContext context, DetailsModel detailsModel) {
-    return Container(
-      margin: const EdgeInsets.only(top: 48),
-      width: MediaQuery
-          .of(context)
-          .size
-          .width,
-      height: MediaQuery
-          .of(context)
-          .size
-          .height * 0.5,
+  SizedBox _buildImageSlider(BuildContext context, DetailsModel detailsModel) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height + 460,
       child: Stack(
         children: [
-          PageView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: detailsModel.images!.length,
-            onPageChanged: (index) {
-              setState(() {
-                _current = index;
-              });
-            },
-            itemBuilder: (context, index) =>
-                Image.network(
-                  detailsModel.images?[index]['url'],
-                  fit: BoxFit.cover,
-                ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: PageView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: detailsModel.images!.length,
+              onPageChanged: (index) {
+                setState(() {
+                  _current = index;
+                });
+              },
+              itemBuilder: (context, index) => Image.network(
+                detailsModel.images?[index]['url'],
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
           Positioned(
-            bottom: 5,
+            top: MediaQuery.of(context).size.height * 0.54,
             left: 0,
             right: 0,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
-                  detailsModel.images!.length,
-                      (index) =>
-                      Container(
-                        width: 10,
-                        height: 10,
-                        margin: const EdgeInsets.only(right: 5),
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: (_current == index)
-                                ? Colors.white
-                                : Colors.white30),
-                      )),
+                detailsModel.images!.length,
+                (index) => AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: (_current == index) ? 25 : 10,
+                    height: 10,
+                    margin: const EdgeInsets.only(right: 5),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: (_current == index)
+                            ? const Color(0xff5BA74E)
+                            : Colors.grey)),
+              ),
             ),
           )
         ],
@@ -208,12 +217,14 @@ class _DetailsPageState extends State<DetailsPage> {
     );
   }
 
-  Container _buildContent(DetailsModel detailsModel,
-      MerchantModel merchantModel) {
+  Container _buildContent(
+      DetailsModel detailsModel, MerchantModel merchantModel) {
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.only(right: 30, left: 30, top: 28, bottom: 65),
       decoration: BoxDecoration(
         color: Colors.white,
+        borderRadius: const BorderRadius.only(
+            topRight: Radius.circular(20), topLeft: Radius.circular(20)),
         boxShadow: [
           BoxShadow(
               spreadRadius: 1,
@@ -226,11 +237,14 @@ class _DetailsPageState extends State<DetailsPage> {
         children: [
           Text(
             detailsModel.categories.toString(),
-            style: const TextStyle(fontSize: 16),
+            style: const TextStyle(fontSize: 18, color: Color(0xff888E9A)),
           ),
           Text(
             detailsModel.name,
-            style: const TextStyle(fontSize: 20),
+            style: const TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.w600,
+                color: Color(0xff24243F)),
           ),
           const SizedBox(
             height: 20,
@@ -238,7 +252,7 @@ class _DetailsPageState extends State<DetailsPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Rp" + detailsModel.price.toString(),
+              Text("IDR " + detailsModel.price.toString(),
                   style: GoogleFonts.workSans(
                       color: ColorsWeplant.colorPrimary,
                       fontWeight: FontWeight.w600,
@@ -249,8 +263,10 @@ class _DetailsPageState extends State<DetailsPage> {
             height: 25,
           ),
           Container(
-            padding: const EdgeInsets.all(5),
-            decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
+            padding: const EdgeInsets.only(bottom: 15),
+            decoration: const BoxDecoration(
+                border:
+                    Border(bottom: BorderSide(color: Colors.grey, width: 1))),
             child: Row(
               children: [
                 ClipRRect(
@@ -261,8 +277,8 @@ class _DetailsPageState extends State<DetailsPage> {
                         border: Border.all(color: Colors.black, width: 0.5)),
                     child: Image.network(
                       merchantModel.main_image['url'],
-                      width: 60,
-                      height: 60,
+                      width: 46,
+                      height: 46,
                     ),
                   ),
                 ),
@@ -274,9 +290,13 @@ class _DetailsPageState extends State<DetailsPage> {
                   children: [
                     Text(
                       merchantModel.name,
+                      style: const TextStyle(
+                          fontSize: 20, color: Color(0xff263238)),
                     ),
                     Text(
                       merchantModel.address['city'],
+                      style: const TextStyle(
+                          fontSize: 15, color: Color(0xff888E9A)),
                     )
                   ],
                 ),
@@ -285,9 +305,97 @@ class _DetailsPageState extends State<DetailsPage> {
           ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 20),
-            child: Text('Description'),
+            child: Text(
+              'Product Description',
+              style: TextStyle(
+                  fontSize: 20,
+                  color: Color(0xff263238),
+                  fontWeight: FontWeight.w600),
+            ),
           ),
-          Text(detailsModel.description)
+          Text(
+            detailsModel.description,
+            style: const TextStyle(color: Color(0xff888E9A), fontSize: 15),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Container(
+            color: Colors.grey,
+            height: 1,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          const Text(
+            'Cara Merawat Product',
+            style: TextStyle(
+                fontSize: 20,
+                color: Color(0xff263238),
+                fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(
+            height: 17,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.asset(
+                'assets/images/sunny.png',
+                width: 20,
+              ),
+              const SizedBox(
+                width: 6,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Cahaya',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width - 100,
+                    child: Text(
+                      'Atur di dekat jendela yang terang & cerah untuk mendapatkan cahaya yang konsisten',
+                      style: TextStyle(fontSize: 15),
+                    ),
+                  )
+                ],
+              )
+            ],
+          ),
+          const SizedBox(
+            height: 24,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.asset(
+                'assets/images/water.png',
+                width: 20,
+              ),
+              const SizedBox(
+                width: 6,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Air',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width - 100,
+                    child: const Text(
+                      'Atur jadwal penyiraman dengan sehari 2 kali',
+                      style: TextStyle(fontSize: 15),
+                    ),
+                  )
+                ],
+              )
+            ],
+          ),
         ],
       ),
     );
@@ -297,7 +405,6 @@ class _DetailsPageState extends State<DetailsPage> {
     return Container(
       color: Colors.white,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
             onPressed: () {
@@ -305,12 +412,62 @@ class _DetailsPageState extends State<DetailsPage> {
             },
             icon: SvgPicture.asset('assets/icons/chevron-left.svg'),
           ),
-          IconButton(
-            onPressed: () {},
-            icon: SvgPicture.asset('assets/icons/shopping-bag.svg'),
+          const Spacer(),
+          BlocBuilder<CartBloc, CartState>(builder: (context, state) {
+            if (state is SuccesLoadCartState && state.listProducts.isNotEmpty) {
+              return Container(
+                decoration: BoxDecoration(
+                    color: const Color(0xffFFB802),
+                    borderRadius: BorderRadius.circular(8)),
+                height: 20,
+                width: 20,
+                child:  Center(
+                  child: Text(
+                    '${state.listProducts.length}',
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
+          const SizedBox(
+            width: 10,
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext c) => const CartsPage()));
+            },
+            child: SvgPicture.asset('assets/icons/shopping-bag.svg'),
+          ),
+          const SizedBox(
+            width: 27,
           )
         ],
       ),
     );
+  }
+
+  Future _showDialog(String msg) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext c) => AlertDialog(
+              title: const Text('Error'),
+              content: Text(msg),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text(
+                    'oke',
+                    style: TextStyle(color: Colors.greenAccent),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ));
   }
 }
