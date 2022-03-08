@@ -3,10 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_flutter/bloc/cart_bloc.dart';
-import 'package:mobile_flutter/bloc/for%20ui/cart_price_bloc.dart';
-import 'package:mobile_flutter/bloc/for%20ui/cart_quantity_bloc.dart';
 import 'package:mobile_flutter/model/cart_event.dart';
 import 'package:mobile_flutter/model/cart_model.dart';
+import 'package:mobile_flutter/model/cart_state.dart';
 
 class CartItemComponent extends StatelessWidget {
   final CartModel listProducts;
@@ -55,18 +54,17 @@ class CartItemComponent extends StatelessWidget {
                             fontSize: 18,
                             color: const Color(0xff24243F)),
                       ),
-                      BlocBuilder<CartQuantityBloc, int>(
-                          builder: (context, value) {
+                      BlocBuilder<CartBloc, CartState>(
+                          builder: (context, state) {
                         return Row(
                           children: [
                             GestureDetector(
                               onTap: () {
-                                context.read<CartQuantityBloc>().minus();
-                                
-                                if (value != 1) {
-                                  context
-                                      .read<CartPriceBloc>()
-                                      .Minus((listProducts.price * value));
+                                if (listProducts.quantity > 1) {
+                                  context.read<CartBloc>().add(
+                                      MinusCartQuantity(
+                                          --listProducts.quantity,
+                                          listProducts.product_id));
                                 }
                               },
                               child: Container(
@@ -82,19 +80,14 @@ class CartItemComponent extends StatelessWidget {
                               ),
                             ),
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 15),
-                              child: BlocBuilder<CartQuantityBloc, int>(
-                                  builder: (context, value) {
-                                return Text('$value');
-                              }),
-                            ),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 15),
+                                child: Text('${listProducts.quantity}')),
                             GestureDetector(
                               onTap: () {
-                                context.read<CartQuantityBloc>().plus();
-                                context
-                                    .read<CartPriceBloc>()
-                                    .Plus((listProducts.price * ++value));
+                                context.read<CartBloc>().add(PlusCartQuantity(
+                                    ++listProducts.quantity,
+                                    listProducts.product_id));
                               },
                               child: Container(
                                 height: 35,
@@ -110,7 +103,7 @@ class CartItemComponent extends StatelessWidget {
                             )
                           ],
                         );
-                      }),
+                      })
                     ],
                   ),
                 ],

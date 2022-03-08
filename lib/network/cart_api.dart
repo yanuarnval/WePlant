@@ -84,6 +84,7 @@ class CartApi {
 
   Future<int> updateQuantityProduct(
       String customerId, String productId, String token, int quantity) async {
+    print(customerId);
     final url =
         Uri.parse(urlProduct + '$customerId' + '/products' + '/$productId');
     final response = await http.patch(url,

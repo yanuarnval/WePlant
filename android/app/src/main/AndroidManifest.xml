@@ -1,11 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.mobile_flutter">
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+
     <application
         android:icon="@mipmap/ic_launcher"
         android:label="WePlant"
         android:networkSecurityConfig="@xml/network_security_config"
         >
+
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBsaMBr4NhiEN4X4AMssURAwRsiF-9wBXQ"/>
 
         <activity
             android:name=".MainActivity"

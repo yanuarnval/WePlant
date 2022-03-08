@@ -44,7 +44,22 @@ class CartBloc extends Bloc<CartEvent, CartState> {
             emit(FailureLoadCartState(e.toString()));
           }
         }
-
+        if (event is PlusCartQuantity) {
+          try{
+            await CartApi().updateQuantityProduct(idCustomer, event.productId, tokenUser, event.value);
+            emit(InitialCartLoadState());
+          }catch(e){
+            print(e);
+          }
+        }
+        if (event is MinusCartQuantity) {
+          try{
+            await CartApi().updateQuantityProduct(idCustomer, event.productId, tokenUser, event.value);
+            emit(InitialCartLoadState());
+          }catch(e){
+            print(e);
+          }
+        }
       },
     );
   }

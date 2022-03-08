@@ -21,3 +21,15 @@ class RemoveProductFromCart extends CartEvent{
 
   RemoveProductFromCart(this.productId);
 }
+
+class PlusCartQuantity extends CartEvent{
+  int value;
+  String productId;
+  PlusCartQuantity(this.value,this.productId);
+}
+
+class MinusCartQuantity extends CartEvent{
+  int value;
+  String productId;
+  MinusCartQuantity(this.value,this.productId);
+}

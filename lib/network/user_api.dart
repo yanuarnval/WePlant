@@ -6,7 +6,7 @@ import 'package:mobile_flutter/shared/url.dart';
 import 'package:http/http.dart' as http;
 
 class UserApi {
-  static const urlRegister = '${Url.url_host}/customers/';
+  static const urlRegister = '${Url.url_host}/customers';
   static const urlLogin = '${Url.url_host}/auth/customer';
 
   Future<UserModel> userRegister(
@@ -35,14 +35,13 @@ class UserApi {
           "email": email,
           "password": password,
         }));
-
+    Map<String, dynamic> decode = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      Map<String, dynamic> decode = jsonDecode(response.body);
       print('res 200');
       return UserModel.jsonFrom(decode['data']);
     } else {
       final e = response.statusCode;
-      throw HttpException('error code $e');
+      throw HttpException('error code $decode');
     }
   }
 }

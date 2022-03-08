@@ -21,6 +21,7 @@ class SuccesLoadPostCartState extends CartState {
   SuccesLoadPostCartState(this.status);
 }
 
+
 class LoadingCartState extends CartState {}
 
 class FailureLoadCartState extends CartState {

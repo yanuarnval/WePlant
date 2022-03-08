@@ -36,6 +36,7 @@ class RegisterBlocAuth extends Bloc<RegisterEvent, RegisterAuthState> {
               'chatrooms': []
             }).then((value) async {
               await pref.setString('uid', value.id);
+              print('erererer');
               emit(SuccesLoadRegisterAuthState());
             }).catchError((onError) => print('error $onError'));
           });

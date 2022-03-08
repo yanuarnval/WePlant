@@ -20,21 +20,23 @@ class LoginBloc extends Bloc<LoginEvent, LoginAuthState> {
               .then((value) async{
             final token = value.token;
             final idCustomer = value.idCustomer;
-            if (token.isNotEmpty) {
-              await pref.setString('token', token);
-              await pref.setString('idCustomer', idCustomer);
-            }
             for (int i = 0; i < userList.docs.length; i++) {
               if (userList.docs
                   .elementAt(i)
                   .data()
                   .containsValue(event.email)) {
+                if (token.isNotEmpty) {
+                  await pref.setString('token', token);
+                  await pref.setString('idCustomer', idCustomer);
+                }
+                print('check');
                 emit(SuccesLoadLoginAuthState(
                     userList.docs
                         .elementAt(i)
                         .id));
               }
             }
+
           });
         } on FirebaseAuthException catch (e) {
           if (e.code == 'user-not-found') {
