@@ -63,7 +63,7 @@ class CartItemComponent extends StatelessWidget {
                                 if (listProducts.quantity > 1) {
                                   context.read<CartBloc>().add(
                                       MinusCartQuantity(
-                                          --listProducts.quantity,
+                                         -1,
                                           listProducts.product_id));
                                 }
                               },
@@ -86,7 +86,7 @@ class CartItemComponent extends StatelessWidget {
                             GestureDetector(
                               onTap: () {
                                 context.read<CartBloc>().add(PlusCartQuantity(
-                                    ++listProducts.quantity,
+                                    1,
                                     listProducts.product_id));
                               },
                               child: Container(

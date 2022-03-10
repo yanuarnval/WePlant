@@ -41,6 +41,7 @@ class _CartsPageState extends State<CartsPage> {
             },
             child: BlocBuilder<CartBloc, CartState>(builder: (context, state) {
               if (state is InitialCartLoadState) {
+                _jmlh=0;
                 context.read<CartBloc>().add(GetProductsFromCart());
               }
               if (state is SuccesLoadCartState) {

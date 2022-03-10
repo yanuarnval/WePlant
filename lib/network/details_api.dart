@@ -25,7 +25,6 @@ class DetailsApi {
     }
   }
 
-  //TODO:add post cart by item id to backend
 
 
 

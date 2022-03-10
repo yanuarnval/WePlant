@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_flutter/bloc/home_bloc.dart';
 import 'package:mobile_flutter/model/product_event.dart';
 import 'package:mobile_flutter/model/product_state_model.dart';
@@ -95,6 +96,8 @@ class _HomePageState extends State<HomePage> {
 
   Container _buildMostwanted(
       BuildContext context, List<ProductModel> listMostwanted) {
+    final listReversed = listMostwanted.reversed.toList();
+
     return Container(
       margin: const EdgeInsets.only(left: 12, right: 12, bottom: 60, top: 15),
       child: Column(
@@ -105,9 +108,10 @@ class _HomePageState extends State<HomePage> {
               Container(
                 padding: const EdgeInsets.only(left: 5),
                 width: MediaQuery.of(context).size.width * 0.44,
-                child: const Text(
+                child: Text(
                   'Most Wanted',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+                  style: GoogleFonts.workSans(
+                      fontSize: 22, fontWeight: FontWeight.w700),
                 ),
               ),
               TextButton(
@@ -124,100 +128,126 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Column(
-                children: [
-                  Column(
-                    children: List.generate(
-                        listMostwanted.length,
-                        (index) => GestureDetector(
-                              onTap: () {},
-                              child: Container(
-                                width: MediaQuery.of(context).size.width * 0.44,
-                                margin:
-                                    const EdgeInsets.symmetric(vertical: 15),
-                                decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(24)),
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: Colors.grey.withOpacity(0.2),
-                                        spreadRadius: 5,
-                                        blurRadius: 15,
-                                        offset: const Offset(0, 9))
-                                  ],
+                children: List.generate(
+                    listMostwanted.length,
+                    (index) => GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (BuildContext c) => DetailsPage(
+                                        idproduct: listMostwanted[index].id)));
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.44,
+                            height: 280,
+                            margin: const EdgeInsets.symmetric(vertical: 15),
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(24)),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    spreadRadius: 5,
+                                    blurRadius: 15,
+                                    offset: const Offset(0, 9))
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: const BorderRadius.only(
+                                      topRight: Radius.circular(16),
+                                      topLeft: Radius.circular(16)),
+                                  child: Image.network(
+                                    listMostwanted[index].imagesModel,
+                                    fit: BoxFit.fill,
+                                    width: double.infinity,
+                                    height: 170,
+                                  ),
                                 ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20.0),
+                                  child: Text(
+                                    (listMostwanted[index].name.length >= 15)
+                                        ? listMostwanted[index]
+                                            .name
+                                            .substring(0, 15)
+                                        : listMostwanted[index].name,
+                                    style: GoogleFonts.workSans(
+                                        color: const Color(0xff24243F),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                const Spacer(),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Image.network(
-                                        listMostwanted[index].imagesModel,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.6,
-                                        height:
-                                            MediaQuery.of(context).size.width *
-                                                0.4,
-                                        fit: BoxFit.contain,
+                                      RichText(
+                                        text: TextSpan(
+                                          text: 'stock ',
+                                          children: [
+                                            TextSpan(
+                                                text:
+                                                    '${listMostwanted[index].stock}',
+                                                style: TextStyle(
+                                                    color: ColorsWeplant
+                                                        .colorPrimary))
+                                          ],
+                                          style: GoogleFonts.workSans(
+                                              color: const Color(0xff5A5A75),
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600),
+                                        ),
                                       ),
                                       Text(
-                                        'Indoor',
-                                        style: GoogleFonts.workSans(
-                                            color: ColorsWeplant.colorTxtSearch,
-                                            fontSize: 12),
-                                      ),
-                                      const SizedBox(
-                                        height: 6,
-                                      ),
-                                      Text(
-                                        listMostwanted[index].name,
-                                        style: GoogleFonts.workSans(
-                                            color: Colors.black, fontSize: 13),
-                                      ),
-                                      const SizedBox(
-                                        height: 3,
-                                      ),
-                                      Text(
-                                        'Rp${listMostwanted[index].price}',
+                                        NumberFormat.currency(
+                                                locale: 'IDR',
+                                                decimalDigits: 0,
+                                                symbol: 'Rp')
+                                            .format(
+                                                listMostwanted[index].price),
                                         style: GoogleFonts.workSans(
                                             fontWeight: FontWeight.w600,
                                             color: ColorsWeplant.colorPrimary,
-                                            fontSize: 13),
-                                      ),
-                                      const SizedBox(
-                                        height: 6,
-                                      ),
-                                      Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.person,
-                                            size: 22,
-                                          ),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          Text(
-                                            "kota jakarta${index}",
-                                            style:
-                                                const TextStyle(fontSize: 10),
-                                          )
-                                        ],
+                                            fontSize: 14),
                                       ),
                                     ],
                                   ),
                                 ),
-                              ),
-                            )),
-                  ),
-                ],
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                              ],
+                            ),
+                          ),
+                        )),
               ),
               Column(
                 children: List.generate(
                     listMostwanted.length,
                     (index) => GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (BuildContext c) => DetailsPage(
+                                        idproduct: listReversed[index].id)));
+                          },
                           child: Container(
                             width: MediaQuery.of(context).size.width * 0.44,
                             margin: const EdgeInsets.symmetric(vertical: 15),
@@ -233,64 +263,83 @@ class _HomePageState extends State<HomePage> {
                                     offset: const Offset(0, 9))
                               ],
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Image.network(
-                                    listMostwanted[
-                                            (listMostwanted.length - 1) - index]
-                                        .imagesModel,
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.6,
-                                    height:
-                                        MediaQuery.of(context).size.width * 0.4,
-                                    fit: BoxFit.contain,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: const BorderRadius.only(
+                                      topRight: Radius.circular(16),
+                                      topLeft: Radius.circular(16)),
+                                  child: Image.network(
+                                    listReversed[index].imagesModel,
+                                    fit: BoxFit.fill,
+                                    width: double.infinity,
+                                    height: 180,
                                   ),
-                                  const Text(
-                                    'Indoor',
-                                  ),
-                                  const SizedBox(
-                                    height: 6,
-                                  ),
-                                  Text(
-                                    listMostwanted[
-                                            (listMostwanted.length - 1) - index]
-                                        .name,
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20.0),
+                                  child: Text(
+                                    listReversed[index].name,
                                     style: GoogleFonts.workSans(
-                                        color: Colors.black, fontSize: 13),
+                                        color: const Color(0xff24243F),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500),
                                   ),
-                                  const SizedBox(
-                                    height: 3,
-                                  ),
-                                  Text(
-                                    'Rp${listMostwanted[(listMostwanted.length - 1) - index].price}',
-                                    style: GoogleFonts.workSans(
-                                        fontWeight: FontWeight.w600,
-                                        color: ColorsWeplant.colorPrimary,
-                                        fontSize: 13),
-                                  ),
-                                  const SizedBox(
-                                    height: 6,
-                                  ),
-                                  Row(
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      const Icon(
-                                        Icons.person,
-                                        size: 22,
-                                      ),
-                                      const SizedBox(
-                                        width: 5,
+                                      RichText(
+                                        text: TextSpan(
+                                          text: 'stock ',
+                                          children: [
+                                            TextSpan(
+                                                text:
+                                                    '${listReversed[index].stock}',
+                                                style: const TextStyle(
+                                                    color: ColorsWeplant
+                                                        .colorPrimary))
+                                          ],
+                                          style: GoogleFonts.workSans(
+                                              color: const Color(0xff5A5A75),
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600),
+                                        ),
                                       ),
                                       Text(
-                                        "kota jakarta${index}",
-                                        style: const TextStyle(fontSize: 10),
-                                      )
+                                        NumberFormat.currency(
+                                                locale: 'IDR',
+                                                decimalDigits: 0,
+                                                symbol: 'Rp')
+                                            .format(listMostwanted[
+                                                    (listMostwanted.length -
+                                                            1) -
+                                                        index]
+                                                .price),
+                                        style: GoogleFonts.workSans(
+                                            fontWeight: FontWeight.w600,
+                                            color: ColorsWeplant.colorPrimary,
+                                            fontSize: 14),
+                                      ),
                                     ],
                                   ),
-                                ],
-                              ),
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                              ],
                             ),
                           ),
                         )),
@@ -330,8 +379,12 @@ class _HomePageState extends State<HomePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
+          Text(
             'Good morning',
+            style: GoogleFonts.workSans(
+              fontWeight: FontWeight.w700,
+              fontSize: 28,
+            ),
           ),
           Container(
             padding: const EdgeInsets.all(8),
@@ -361,7 +414,7 @@ class _HomePageState extends State<HomePage> {
       BuildContext context, List<ProductModel> listProduct) {
     return Container(
       color: Colors.white,
-      height: 350,
+      height: 360,
       child: ListView.builder(
         physics: const BouncingScrollPhysics(),
         itemCount: listProduct.length,
@@ -370,10 +423,12 @@ class _HomePageState extends State<HomePage> {
           return GestureDetector(
             onTap: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext c) =>
-                          DetailsPage(idproduct: listProduct[i].id)));
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext c) =>
+                      DetailsPage(idproduct: listProduct[i].id),
+                ),
+              );
             },
             child: Container(
               margin: EdgeInsets.only(
@@ -381,7 +436,7 @@ class _HomePageState extends State<HomePage> {
                   bottom: 30,
                   left: 15,
                   right: (i == listProduct.length) ? 15 : 0),
-              width: 180,
+              width: 205,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(16)),
                 color: Colors.white,
@@ -393,30 +448,42 @@ class _HomePageState extends State<HomePage> {
                       offset: const Offset(0, 9))
                 ],
               ),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Image.network(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                        topRight: Radius.circular(16),
+                        topLeft: Radius.circular(16)),
+                    child: Image.network(
                       listProduct[i].imagesModel,
-                      fit: BoxFit.cover,
-                      width: 160,
-                      height: 160,
+                      fit: BoxFit.fill,
+                      width: double.infinity,
+                      height: 170,
                     ),
-                    const Spacer(),
-                    Text(
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Text(
                       (listProduct[i].name.length >= 15)
                           ? listProduct[i].name.substring(0, 15)
                           : listProduct[i].name,
                       style: GoogleFonts.workSans(
                           color: const Color(0xff24243F),
-                          fontSize: 22,
+                          fontSize: 18,
                           fontWeight: FontWeight.w500),
                     ),
-                    const Spacer(),
-                    Text(
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Text(
                       (listProduct[i].description.length >= 47)
                           ? listProduct[i].description.substring(0, 47).trim() +
                               '...'
@@ -426,28 +493,44 @@ class _HomePageState extends State<HomePage> {
                           fontSize: 13,
                           fontWeight: FontWeight.w400),
                     ),
-                    const SizedBox(
-                      height: 6,
-                    ),
-                    Row(
+                  ),
+                  const Spacer(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'stock(${listProduct[i].stock})',
-                          style: const TextStyle(
-                              color: Color(0xff24243F), fontSize: 12),
+                        RichText(
+                          text: TextSpan(
+                            text: 'stock ',
+                            children: [
+                              TextSpan(
+                                  text: '${listProduct[i].stock}',
+                                  style: TextStyle(
+                                      color: ColorsWeplant.colorPrimary))
+                            ],
+                            style: GoogleFonts.workSans(
+                                color: const Color(0xff5A5A75),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600),
+                          ),
                         ),
                         Text(
-                          'IDR ${listProduct[i].price}',
+                          NumberFormat.currency(
+                                  locale: 'IDR', decimalDigits: 0, symbol: 'Rp')
+                              .format(listProduct[i].price),
                           style: GoogleFonts.workSans(
                               fontWeight: FontWeight.w600,
                               color: ColorsWeplant.colorPrimary,
                               fontSize: 14),
                         ),
                       ],
-                    )
-                  ],
-                ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                ],
               ),
             ),
           );

@@ -187,7 +187,7 @@ class _DetailsPageState extends State<DetailsPage> {
               },
               itemBuilder: (context, index) => Image.network(
                 detailsModel.images?[index]['url'],
-                fit: BoxFit.cover,
+
               ),
             ),
           ),
