@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:mobile_flutter/model/transaksi_model.dart';
 import 'package:mobile_flutter/shared/url.dart';
 import 'package:http/http.dart' as http;
 
@@ -32,6 +33,26 @@ class TransaksiApi {
       return body['data']['qr_code'];
     } else {
       throw ('${body['status']}');
+    }
+  }
+
+  Future<List<TransaksiModel>> getTransaksi(
+      String customerId, String token) async {
+    final urlTransaksi = url + '/customers/$customerId/transactions';
+    final request = await http.get(Uri.parse(urlTransaksi), headers: {
+      'Authorization': 'Bearer $token',
+    });
+    Map<String, dynamic> body = jsonDecode(request.body);
+    print(body);
+    if (request.statusCode == 200) {
+      List transaction = body['data']['transactions'];
+      List<TransaksiModel> model = [];
+      for (int i = 0; i < transaction.length; i++) {
+        model.add(TransaksiModel.fromJson(transaction[i]));
+      }
+      return model;
+    }else{
+      throw(request.statusCode.toString());
     }
   }
 }

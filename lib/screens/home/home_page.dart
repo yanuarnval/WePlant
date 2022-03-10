@@ -140,7 +140,7 @@ class _HomePageState extends State<HomePage> {
                           },
                           child: Container(
                             width: MediaQuery.of(context).size.width * 0.44,
-                            height: 280,
+                            height: 290,
                             margin: const EdgeInsets.symmetric(vertical: 15),
                             decoration: BoxDecoration(
                               borderRadius:
@@ -400,9 +400,7 @@ class _HomePageState extends State<HomePage> {
                     MaterialPageRoute(
                         builder: (BuildContext c) => const ListUserPage()));
               },
-              icon: const Icon(
-                FontAwesomeIcons.envelope,
-              ),
+              icon: SvgPicture.asset('assets/icons/chat_icon.svg'),
             ),
           )
         ],

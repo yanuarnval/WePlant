@@ -71,9 +71,9 @@ class _CheckoutpageState extends State<Checkoutpage> {
       rotation: locationData.heading!,
     );
     setState(() {
-      _addressController.text = address.first.subAdministrativeArea!;
+      _addressController.text = address.first.locality!;
       _provinceController.text = address.first.administrativeArea!;
-      _cityController.text = address.first.locality!;
+      _cityController.text = address.first.subAdministrativeArea!;
       _postalCodeController.text = address.first.postalCode!;
     });
   }

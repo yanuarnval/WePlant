@@ -14,3 +14,7 @@ class PostTransaksi extends TransaksiEvent {
   PostTransaksi(this.address, this.city, this.province, this.postalCode);
 }
 
+class GetTransaction extends TransaksiEvent{
+
+}
+

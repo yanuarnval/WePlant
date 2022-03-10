@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mobile_flutter/bloc/for%20ui/main_screen_bloc.dart';
+import 'package:mobile_flutter/screens/feed/feed_page.dart';
+import 'package:mobile_flutter/screens/order/order_history.dart';
 import 'package:mobile_flutter/screens/transaksi_page.dart';
 import 'package:mobile_flutter/screens/home/home_page.dart';
 import 'package:mobile_flutter/screens/cart/cart_page.dart';
@@ -19,8 +22,8 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   static List<Widget> pages = <Widget>[
     const HomePage(),
-    const ProfilPage(),
-    const ProfilPage(),
+    const OrderHistory(),
+    const FeedPage(),
     const ProfilPage()
   ];
 
@@ -68,34 +71,48 @@ class _MainScreenState extends State<MainScreen> {
               selectedIconTheme:
                   const IconThemeData(color: ColorsWeplant.colorPrimary),
               type: BottomNavigationBarType.fixed,
-              items: const [
+              items: [
                 BottomNavigationBarItem(
                     label: "",
-                    icon: FaIcon(
-                      FontAwesomeIcons.store,
-                      size: 20,
+                    icon: SvgPicture.asset(
+                      'assets/icons/home_icon.svg',
+                      width: 24,
+                      height: 24,
+                      color: (value==0)?ColorsWeplant.colorPrimary:Colors.black,
                     )),
                 BottomNavigationBarItem(
                     label: "",
-                    icon: FaIcon(
-                      FontAwesomeIcons.newspaper,
-                      size: 20,
+                    icon: SvgPicture.asset(
+                      'assets/icons/order_icon.svg',
+                      width: 26,
+                      height: 26,
+                      color: (value==1)?ColorsWeplant.colorPrimary:Colors.black,
                     )),
                 BottomNavigationBarItem(
                     label: "",
-                    icon: FaIcon(
-                      FontAwesomeIcons.shoppingBag,
-                      size: 20,
+                    icon: SvgPicture.asset(
+                      'assets/icons/cart_icon.svg',
+                      width: 22,
+                      height: 22,
+                      color: (value==2)?ColorsWeplant.colorPrimary:Colors.black,
                     )),
                 BottomNavigationBarItem(
                     label: "",
-                    icon: FaIcon(
-                      FontAwesomeIcons.userAlt,
-                      size: 20,
+                    icon: SvgPicture.asset(
+                      'assets/icons/profile_icon.svg',
+                      width: 24,
+                      height: 24,
+                      color: (value==3)?ColorsWeplant.colorPrimary:Colors.black,
                     )),
               ],
               currentIndex: value,
               onTap: (index) {
+                if (index == 2) {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext c) => const CartsPage()));
+                }
                 context.read<MainScreenBloc>().changeIndex(index);
               }),
         ),
